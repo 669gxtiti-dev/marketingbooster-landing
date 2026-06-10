@@ -1,0 +1,3099 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketingBooster · Dashboard Privé</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --white: #ffffff;
+  --off: #f9f8f6;
+  --light: #f2f0ec;
+  --border: #e8e4dd;
+  --text: #1a1814;
+  --muted: #8a8278;
+  --green: #00c47a;
+  --blue: #3b6fff;
+  --coral: #ff5c3a;
+  --amber: #f5a623;
+  --purple: #7c3aed;
+  --dark: #111010;
+  --sidebar-w: 260px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'Outfit',sans-serif; background:var(--off); color:var(--text); display:flex; min-height:100vh; overflow-x:hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:var(--sidebar-w); background:var(--dark); color:white;
+  position:fixed; top:0; left:0; height:100vh; z-index:200;
+  display:flex; flex-direction:column; padding:0;
+  overflow-y:auto;
+}
+.sidebar-logo {
+  padding:1.6rem 1.5rem 1.2rem;
+  font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo em { color:var(--green); font-style:italic; }
+.sidebar-badge {
+  display:inline-block; background:var(--green); color:white;
+  font-size:0.6rem; font-weight:700; padding:0.15rem 0.5rem;
+  border-radius:100px; text-transform:uppercase; letter-spacing:0.06em;
+  margin-left:0.5rem; vertical-align:middle;
+}
+.sidebar-section {
+  padding:1rem 1rem 0.3rem;
+  font-size:0.6rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.12em; color:rgba(255,255,255,0.28);
+}
+.nav-item {
+  display:flex; align-items:center; gap:0.75rem;
+  padding:0.7rem 1.2rem; margin:0.1rem 0.6rem;
+  border-radius:10px; cursor:pointer; transition:all 0.2s;
+  font-size:0.88rem; font-weight:500; color:rgba(255,255,255,0.6);
+}
+.nav-item:hover { background:rgba(255,255,255,0.08); color:white; }
+.nav-item.active { background:rgba(0,196,122,0.15); color:var(--green); }
+.nav-item .icon { font-size:1.1rem; width:22px; text-align:center; }
+.sidebar-bottom { margin-top:auto; padding:1rem 1.5rem 1.5rem; border-top:1px solid rgba(255,255,255,0.08); }
+.version-tag { font-size:0.75rem; color:rgba(255,255,255,0.2); }
+
+/* ── MAIN ── */
+.main { margin-left:var(--sidebar-w); flex:1; min-height:100vh; }
+.topbar {
+  background:var(--white); border-bottom:1px solid var(--border);
+  padding:1.1rem 2rem; display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+}
+.topbar-title { font-family:'Playfair Display',serif; font-size:1.35rem; font-weight:700; }
+.topbar-title span { color:var(--green); font-style:italic; }
+.topbar-right { display:flex; align-items:center; gap:1rem; }
+.status-dot { width:8px; height:8px; border-radius:50%; background:var(--green); display:inline-block; }
+.status-text { font-size:0.82rem; color:var(--muted); }
+.backend-status { display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0.9rem; border-radius:100px; background:var(--off); border:1px solid var(--border); }
+
+/* ── PAGES ── */
+.page { display:none; padding:2rem; }
+.page.active { display:block; }
+
+/* ── CARDS ── */
+.card {
+  background:var(--white); border:1px solid var(--border);
+  border-radius:20px; padding:1.8rem;
+  margin-bottom:1.5rem;
+}
+.card-title { font-family:'Playfair Display',serif; font-size:1.15rem; font-weight:700; margin-bottom:0.3rem; }
+.card-sub { font-size:0.85rem; color:var(--muted); margin-bottom:1.5rem; line-height:1.5; }
+
+/* ── STATS ROW ── */
+.stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1.2rem; margin-bottom:2rem; }
+.stat-card {
+  background:var(--white); border:1px solid var(--border);
+  border-radius:16px; padding:1.3rem 1.5rem;
+}
+.stat-card .num {
+  font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; line-height:1; margin-bottom:0.2rem;
+}
+.stat-card .num.g { color:var(--green); }
+.stat-card .num.b { color:var(--blue); }
+.stat-card .num.c { color:var(--coral); }
+.stat-card .num.p { color:var(--purple); }
+.stat-card .lbl { font-size:0.78rem; color:var(--muted); font-weight:500; }
+
+/* ── FORM ELEMENTS ── */
+label { display:block; font-size:0.82rem; font-weight:600; margin-bottom:0.4rem; color:var(--text); }
+input, textarea, select {
+  width:100%; padding:0.75rem 1rem;
+  border:1.5px solid var(--border); border-radius:12px;
+  font-family:'Outfit',sans-serif; font-size:0.9rem; color:var(--text);
+  background:var(--white); outline:none; transition:border 0.2s;
+  margin-bottom:1rem;
+}
+input:focus, textarea:focus, select:focus { border-color:var(--green); }
+textarea { resize:vertical; min-height:90px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.form-row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+
+/* ── BUTTONS ── */
+.btn {
+  display:inline-flex; align-items:center; gap:0.5rem;
+  padding:0.75rem 1.6rem; border-radius:100px;
+  font-family:'Outfit',sans-serif; font-weight:700; font-size:0.9rem;
+  cursor:pointer; border:none; transition:all 0.22s;
+}
+.btn-green { background:var(--green); color:white; }
+.btn-green:hover { background:#00e58d; transform:translateY(-1px); box-shadow:0 10px 25px rgba(0,196,122,0.3); }
+.btn-dark { background:var(--dark); color:white; }
+.btn-dark:hover { background:#222; transform:translateY(-1px); }
+.btn-blue { background:var(--blue); color:white; }
+.btn-blue:hover { background:#2d5ce8; transform:translateY(-1px); }
+.btn-coral { background:var(--coral); color:white; }
+.btn-coral:hover { background:#ff3d1a; transform:translateY(-1px); }
+.btn-outline { background:transparent; color:var(--text); border:1.5px solid var(--border); }
+.btn-outline:hover { border-color:var(--text); }
+.btn-sm { padding:0.5rem 1.1rem; font-size:0.8rem; }
+.btn:disabled { opacity:0.5; cursor:not-allowed; transform:none !important; }
+
+/* ── PLATFORMS CHECKBOXES ── */
+.platforms-grid { display:flex; flex-wrap:wrap; gap:0.7rem; margin-bottom:1rem; }
+.plat-chip {
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.5rem 1rem; border-radius:100px;
+  border:1.5px solid var(--border); cursor:pointer;
+  font-size:0.85rem; font-weight:600; transition:all 0.18s;
+  user-select:none;
+}
+.plat-chip.sel { border-color:var(--green); background:rgba(0,196,122,0.08); color:var(--green); }
+.plat-chip:hover { border-color:var(--text); }
+
+/* ── RESULTS TABLE ── */
+.results-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+th {
+  text-align:left; font-size:0.72rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.08em; color:var(--muted);
+  padding:0.6rem 0.8rem; border-bottom:2px solid var(--border);
+}
+td {
+  padding:0.85rem 0.8rem; border-bottom:1px solid var(--border);
+  font-size:0.85rem; vertical-align:top;
+}
+tr:hover td { background:var(--off); }
+.score-badge {
+  display:inline-block; padding:0.2rem 0.6rem; border-radius:100px;
+  font-size:0.75rem; font-weight:700;
+}
+.score-hi { background:rgba(0,196,122,0.12); color:var(--green); }
+.score-md { background:rgba(245,166,35,0.12); color:var(--amber); }
+.score-lo { background:rgba(255,92,58,0.12); color:var(--coral); }
+.plat-tag {
+  display:inline-block; padding:0.15rem 0.55rem; border-radius:6px;
+  font-size:0.7rem; font-weight:600; margin-right:0.25rem;
+}
+.tag-tiktok { background:rgba(0,196,122,0.1); color:var(--green); }
+.tag-linkedin { background:rgba(59,111,255,0.1); color:var(--blue); }
+.tag-instagram { background:rgba(255,92,58,0.1); color:var(--coral); }
+.tag-google { background:rgba(245,166,35,0.1); color:var(--amber); }
+.tag-maps { background:rgba(124,58,237,0.1); color:var(--purple); }
+
+/* ── PROGRESS / LOADER ── */
+.progress-wrap { background:var(--light); border-radius:100px; height:8px; overflow:hidden; margin:0.5rem 0 1rem; }
+.progress-bar { height:100%; background:var(--green); border-radius:100px; transition:width 0.4s ease; }
+.loader { display:none; align-items:center; gap:0.8rem; padding:1rem 0; color:var(--muted); font-size:0.88rem; }
+.loader.active { display:flex; }
+.spin { width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--green); border-radius:50%; animation:spin 0.7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── LOG ── */
+.log-box {
+  background:var(--dark); border-radius:14px; padding:1.2rem;
+  font-family:monospace; font-size:0.78rem; color:#aaa;
+  max-height:220px; overflow-y:auto; line-height:1.7;
+  margin-top:1rem;
+}
+.log-box .ok { color:var(--green); }
+.log-box .err { color:var(--coral); }
+.log-box .info { color:var(--blue); }
+.log-box .warn { color:var(--amber); }
+
+/* ── EMAIL TEMPLATES ── */
+.template-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+.template-card {
+  border:1.5px solid var(--border); border-radius:14px; padding:1.2rem;
+  cursor:pointer; transition:all 0.2s;
+}
+.template-card:hover { border-color:var(--green); transform:translateY(-2px); }
+.template-card.sel { border-color:var(--green); background:rgba(0,196,122,0.05); }
+.template-card .t-name { font-weight:700; font-size:0.9rem; margin-bottom:0.3rem; }
+.template-card .t-desc { font-size:0.78rem; color:var(--muted); line-height:1.5; }
+
+/* ── PROSPECT CARDS (mobile-friendly grid) ── */
+.prospects-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1rem; }
+.prospect-card {
+  background:var(--white); border:1px solid var(--border); border-radius:16px;
+  padding:1.3rem; transition:all 0.2s; position:relative;
+}
+.prospect-card:hover { box-shadow:0 8px 30px rgba(0,0,0,0.07); transform:translateY(-2px); }
+.prospect-card .p-name { font-weight:700; font-size:0.95rem; margin-bottom:0.2rem; }
+.prospect-card .p-handle { font-size:0.78rem; color:var(--muted); margin-bottom:0.6rem; }
+.prospect-card .p-bio { font-size:0.8rem; color:var(--muted); line-height:1.5; margin-bottom:0.8rem; }
+.prospect-card .p-actions { display:flex; gap:0.5rem; flex-wrap:wrap; }
+.prospect-card .p-msg { font-size:0.78rem; background:var(--off); border-radius:10px; padding:0.7rem; line-height:1.5; margin-bottom:0.8rem; border-left:3px solid var(--green); }
+.sent-badge { position:absolute; top:1rem; right:1rem; background:var(--green); color:white; font-size:0.65rem; font-weight:700; padding:0.2rem 0.5rem; border-radius:100px; }
+
+/* ── TABS ── */
+.tabs { display:flex; gap:0.4rem; margin-bottom:1.5rem; border-bottom:2px solid var(--border); padding-bottom:0; }
+.tab {
+  padding:0.6rem 1.2rem; font-size:0.85rem; font-weight:600;
+  cursor:pointer; border-radius:8px 8px 0 0; transition:all 0.2s;
+  color:var(--muted); border:none; background:transparent; margin-bottom:-2px;
+}
+.tab.active { color:var(--green); border-bottom:2px solid var(--green); }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* ── ALERT ── */
+.alert {
+  padding:0.9rem 1.2rem; border-radius:12px; font-size:0.85rem;
+  margin-bottom:1rem; display:flex; align-items:center; gap:0.6rem;
+}
+.alert-green { background:rgba(0,196,122,0.1); color:#006b42; border:1px solid rgba(0,196,122,0.3); }
+.alert-blue { background:rgba(59,111,255,0.1); color:#1a3eb0; border:1px solid rgba(59,111,255,0.3); }
+.alert-coral { background:rgba(255,92,58,0.1); color:#b02d15; border:1px solid rgba(255,92,58,0.3); }
+
+/* ── SETTINGS ── */
+.settings-row { display:flex; align-items:center; justify-content:space-between; padding:1rem 0; border-bottom:1px solid var(--border); }
+.settings-row:last-child { border-bottom:none; }
+.settings-label { font-weight:600; font-size:0.9rem; }
+.settings-desc { font-size:0.78rem; color:var(--muted); margin-top:0.2rem; }
+.toggle {
+  width:44px; height:24px; background:var(--border); border-radius:100px;
+  position:relative; cursor:pointer; transition:background 0.2s; border:none;
+}
+.toggle.on { background:var(--green); }
+.toggle::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:18px; height:18px; border-radius:50%; background:white;
+  transition:left 0.2s;
+}
+.toggle.on::after { left:23px; }
+
+/* ── CHART ── */
+.mini-chart { display:flex; align-items:flex-end; gap:4px; height:50px; margin-top:0.5rem; }
+.bar-mini { flex:1; background:var(--green); border-radius:3px 3px 0 0; opacity:0.7; transition:opacity 0.2s; }
+.bar-mini:hover { opacity:1; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform:translateX(-260px); transition:transform 0.3s; width:260px; }
+  .sidebar.open { transform:translateX(0); }
+  .main { margin-left:0; }
+  .form-row, .form-row3 { grid-template-columns:1fr; }
+  .hamburger { display:flex !important; }
+  .topbar { padding:1rem 1.2rem; }
+  .page { padding:1.2rem; }
+}
+.hamburger { display:none; flex-direction:column; gap:4px; cursor:pointer; padding:0.3rem; }
+.hamburger span { width:22px; height:2px; background:var(--text); border-radius:2px; }
+
+/* ── CONFIG CARDS ── */
+.config-card {
+  background:var(--white); border:1.5px solid var(--border);
+  border-radius:18px; padding:1.4rem 1.5rem; margin-bottom:1rem;
+  position:relative; transition:border 0.2s;
+}
+.config-card.running { border-color:var(--green); }
+.config-card.done { border-color:var(--green); background:rgba(0,196,122,0.03); }
+.config-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;
+}
+.config-num {
+  width:28px; height:28px; border-radius:50%;
+  background:var(--dark); color:white; font-size:0.75rem;
+  font-weight:700; display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.config-name { font-weight:700; font-size:0.95rem; flex:1; margin-left:0.6rem; }
+.config-status { font-size:0.72rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:100px; }
+.config-status.wait { background:var(--light); color:var(--muted); }
+.config-status.run { background:rgba(0,196,122,0.1); color:var(--green); }
+.config-status.done { background:rgba(0,196,122,0.15); color:var(--green); }
+.config-status.err { background:rgba(255,92,58,0.1); color:var(--coral); }
+.config-body { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
+@media(max-width:600px){ .config-body { grid-template-columns:1fr; } }
+.config-field label { margin-bottom:0.25rem; font-size:0.78rem; }
+.config-field input, .config-field select { margin-bottom:0; font-size:0.82rem; padding:0.55rem 0.8rem; }
+.config-plats { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.5rem; }
+.config-plat {
+  font-size:0.72rem; font-weight:700; padding:0.25rem 0.65rem;
+  border-radius:100px; border:1.5px solid var(--border);
+  cursor:pointer; transition:all 0.15s; user-select:none;
+}
+.config-plat.sel { border-color:var(--green); background:rgba(0,196,122,0.08); color:var(--green); }
+
+/* ── SESSION CARDS ── */
+.session-card {
+  background:var(--white); border:1.5px solid var(--border);
+  border-radius:18px; padding:1.4rem 1.5rem;
+  cursor:pointer; transition:all 0.22s; position:relative;
+  display:flex; flex-direction:column; gap:0.5rem;
+}
+.session-card:hover { border-color:var(--green); transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,0.08); }
+.session-card .s-name { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; }
+.session-card .s-meta { font-size:0.78rem; color:var(--muted); }
+.session-card .s-count { font-size:1.6rem; font-weight:900; color:var(--green); font-family:'Playfair Display',serif; }
+.session-card .s-actions { display:flex; gap:0.5rem; margin-top:0.5rem; }
+.sessions-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1.2rem; }
+.status-pills { display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.4rem; }
+.status-pill { font-size:0.65rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:100px; }
+.pill-new { background:rgba(138,130,120,0.12); color:var(--muted); }
+.pill-contacte { background:rgba(59,111,255,0.12); color:var(--blue); }
+.pill-reponse { background:rgba(245,166,35,0.12); color:var(--amber); }
+.pill-converti { background:rgba(0,196,122,0.12); color:var(--green); }
+
+/* ── STATUS TOGGLE ── */
+.status-toggle { display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.6rem; }
+.status-btn {
+  font-size:0.7rem; font-weight:700; padding:0.25rem 0.65rem;
+  border-radius:100px; border:1.5px solid var(--border);
+  cursor:pointer; background:var(--white); transition:all 0.18s;
+}
+.status-btn.active-contacte { background:rgba(59,111,255,0.1); border-color:var(--blue); color:var(--blue); }
+.status-btn.active-reponse { background:rgba(245,166,35,0.1); border-color:var(--amber); color:var(--amber); }
+.status-btn.active-converti { background:rgba(0,196,122,0.1); border-color:var(--green); color:var(--green); }
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align:center; padding:3rem 1rem; color:var(--muted); }
+.empty-state .icon { font-size:2.5rem; margin-bottom:1rem; opacity:0.5; }
+.empty-state p { font-size:0.9rem; }
+
+/* ── COPY BTN ── */
+.copy-btn { cursor:pointer; opacity:0.5; transition:opacity 0.2s; font-size:0.9rem; border:none; background:none; }
+.copy-btn:hover { opacity:1; }
+
+/* ── OPT BLOCKS (option blocs cochables) ── */
+.opt-blocks { display:flex; flex-direction:column; gap:0.75rem; }
+.opt-block {
+  border:2px solid var(--green);
+  border-radius:16px; overflow:hidden;
+  transition:all 0.2s;
+}
+.opt-block-off {
+  border-color:var(--border);
+}
+.opt-block-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:1rem 1.2rem; cursor:pointer; user-select:none;
+  transition:background 0.15s;
+}
+.opt-block:not(.opt-block-off) .opt-block-header { background:rgba(0,196,122,0.04); }
+.opt-block-header:hover { background:rgba(0,0,0,0.03); }
+.opt-block-title { font-weight:700; font-size:0.92rem; }
+.opt-block-desc { font-size:0.78rem; color:var(--muted); margin-top:0.1rem; }
+.opt-check {
+  width:26px; height:26px; border-radius:8px; flex-shrink:0;
+  background:var(--green); color:white;
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.85rem; font-weight:900; transition:all 0.2s;
+}
+.opt-check-off {
+  background:var(--border); color:transparent;
+}
+.opt-arrow { font-size:0.9rem; color:var(--muted); transition:transform 0.2s; }
+.opt-block-body { padding:0 1.2rem 1.2rem; border-top:1px solid var(--border); margin-top:0; padding-top:1rem; }
+.opt-block-off .opt-block-body { display:none !important; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    Marketing<em>Booster</em>
+    <span class="sidebar-badge">PRO</span>
+  </div>
+
+  <div class="sidebar-section">Principal</div>
+  <div class="nav-item active" onclick="goTo('dashboard')"><span class="icon">🏠</span> Dashboard</div>
+  <div class="nav-item" onclick="goTo('prospection')"><span class="icon">🚀</span> Prospection</div>
+  <div class="nav-item" onclick="goTo('prospection-avancee')"><span class="icon">✨</span> Prospection avancée</div>
+  <div class="nav-item" onclick="goTo('prospects')"><span class="icon">👥</span> Mes Prospects</div>
+
+  <div class="sidebar-section">Automatisation</div>
+  <div class="nav-item" onclick="goTo('emails')"><span class="icon">📧</span> Emails Automatisés</div>
+  <div class="nav-item" onclick="goTo('sequences')"><span class="icon">⚡</span> Séquences</div>
+
+  <div class="sidebar-section">Données</div>
+  <div class="nav-item" onclick="goTo('stats')"><span class="icon">📊</span> Statistiques</div>
+  <div class="nav-item" onclick="goTo('export')"><span class="icon">📥</span> Export CSV / JSON</div>
+
+  <div class="sidebar-section">Config</div>
+  <div class="nav-item" onclick="goTo('settings')"><span class="icon">⚙️</span> Paramètres</div>
+
+  <div class="sidebar-bottom">
+    <div class="version-tag">Dashboard Privé v2.0 · Accès total</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="topbar-title">Marketing<span>Booster</span> <em style="font-family:'Outfit',sans-serif;font-style:normal;font-size:0.85rem;color:var(--muted);font-weight:400;">Dashboard Privé</em></div>
+    </div>
+    <div class="topbar-right">
+      <div class="backend-status" id="backend-status">
+        <div class="status-dot" id="status-dot" style="background:var(--amber);"></div>
+        <span class="status-text" id="status-text">Connexion...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ DASHBOARD ═══════════════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="num g" id="stat-total">0</div>
+        <div class="lbl">Prospects trouvés</div>
+        <div class="mini-chart" id="chart-prospects"></div>
+      </div>
+      <div class="stat-card">
+        <div class="num b" id="stat-emails">0</div>
+        <div class="lbl">Emails envoyés</div>
+      </div>
+      <div class="stat-card">
+        <div class="num c" id="stat-sessions">0</div>
+        <div class="lbl">Sessions de prospection</div>
+      </div>
+      <div class="stat-card">
+        <div class="num p" id="stat-score">—</div>
+        <div class="lbl">Score moyen IA</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚀 Lancer une prospection rapide</div>
+      <div class="card-sub">Configure et lance une recherche de prospects en quelques secondes.</div>
+      <div class="form-row">
+        <div>
+          <label>Niche / Secteur</label>
+          <input type="text" id="quick-niche" placeholder="ex: coach fitness, agence social media...">
+        </div>
+        <div>
+          <label>Localisation (optionnel)</label>
+          <input type="text" id="quick-loc" placeholder="ex: France, Paris...">
+        </div>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label>Plateformes</label>
+        <div class="platforms-grid" id="quick-platforms">
+          <div class="plat-chip sel" data-p="tiktok">🎵 TikTok</div>
+          <div class="plat-chip sel" data-p="linkedin">💼 LinkedIn</div>
+          <div class="plat-chip sel" data-p="instagram">📸 Instagram</div>
+          <div class="plat-chip sel" data-p="google">🔍 Google</div>
+          <div class="plat-chip sel" data-p="maps">📍 Google Maps</div>
+        </div>
+      </div>
+
+      <!-- OPTIONS AVANCÉES INLINE (masquées par défaut) -->
+      <div id="quick-advanced" style="display:none;border-top:1px solid var(--border);padding-top:1rem;margin-top:0.2rem;margin-bottom:1rem;">
+        <div class="form-row">
+          <div>
+            <label>Nombre de prospects</label>
+            <select id="quick-count">
+              <option value="25">25 prospects</option>
+              <option value="50" selected>50 prospects</option>
+              <option value="100">100 prospects</option>
+              <option value="200">200 prospects</option>
+              <option value="500">500 prospects</option>
+            </select>
+          </div>
+          <div>
+            <label>Score IA minimum</label>
+            <select id="quick-score">
+              <option value="0">Tous</option>
+              <option value="5">5+</option>
+              <option value="7" selected>7+</option>
+              <option value="8">8+</option>
+              <option value="9">9+</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label>Langue</label>
+            <select id="quick-lang">
+              <option value="fr">🇫🇷 Français</option>
+              <option value="en">🇬🇧 Anglais</option>
+              <option value="es">🇪🇸 Espagnol</option>
+            </select>
+          </div>
+          <div>
+            <label>Followers min / max</label>
+            <div style="display:flex;gap:0.4rem;">
+              <input type="number" id="quick-fmin" placeholder="min" style="margin:0;flex:1;">
+              <input type="number" id="quick-fmax" placeholder="max" style="margin:0;flex:1;">
+            </div>
+          </div>
+        </div>
+        <div>
+          <label>Mots-clés à exclure</label>
+          <input type="text" id="quick-exkw" placeholder="recruteur, emploi..." style="margin:0;">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-green" id="btn-launch-quick" onclick="lancerProspection('quick')">
+          🚀 Lancer la prospection
+        </button>
+        <button class="btn btn-outline btn-sm" id="btn-quick-adv" onclick="toggleQuickAdvanced()">⚙️ Options avancées</button>
+      </div>
+      <div class="loader" id="loader-quick">
+        <div class="spin"></div>
+        <span id="loader-quick-text">Connexion au backend...</span>
+      </div>
+      <div class="progress-wrap" id="progress-wrap-quick" style="display:none;">
+        <div class="progress-bar" id="progress-bar-quick" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Derniers prospects</div>
+      <div class="card-sub">Les 5 derniers prospects trouvés. <a href="#" onclick="goTo('prospects');return false;" style="color:var(--green);">Voir tout →</a></div>
+      <div id="dashboard-recent">
+        <div class="empty-state"><div class="icon">🔍</div><p>Lance une prospection pour voir tes prospects ici.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Log des activités</div>
+      <div class="log-box" id="global-log">
+        <span class="info">[INFO] Dashboard privé chargé — accès total activé</span><br>
+        <span class="info">[INFO] Connexion au backend Render en cours...</span><br>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ PROSPECTION ═══════════════ -->
+  <div class="page" id="page-prospection">
+
+    <!-- HEADER -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;">🎯 Prospection multi-cibles</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-top:0.2rem;">Configure plusieurs cibles et lance-les toutes en une seule fois</p>
+      </div>
+      <div style="display:flex;gap:0.7rem;flex-wrap:wrap;">
+        <button class="btn btn-outline btn-sm" onclick="ajouterConfig()">➕ Ajouter une cible</button>
+        <button class="btn btn-green" id="btn-launch-all" onclick="lancerToutesConfigs()">🚀 Tout lancer</button>
+      </div>
+    </div>
+
+    <!-- CONFIGS CONTAINER -->
+    <div id="configs-container"></div>
+
+    <!-- OPTIONS GLOBALES (email, IA) -->
+    <div class="card" style="margin-top:1rem;">
+      <div class="card-title">⚙️ Options globales</div>
+      <div class="card-sub">Ces réglages s'appliquent à toutes les cibles.</div>
+      <div class="tabs" id="tabs-global">
+        <button class="tab active" onclick="switchTabGlobal('gtab-ia')">🤖 IA & Messages</button>
+        <button class="tab" onclick="switchTabGlobal('gtab-email')">📧 Email auto</button>
+      </div>
+
+      <div class="tab-content active" id="gtab-ia">
+        <div style="margin-bottom:1rem;">
+          <label>Ton des messages IA</label>
+          <div class="platforms-grid" id="tone-chips">
+            <div class="plat-chip sel" data-t="professionnel">💼 Professionnel</div>
+            <div class="plat-chip" data-t="casual">😊 Casual</div>
+            <div class="plat-chip" data-t="direct">⚡ Direct</div>
+            <div class="plat-chip" data-t="expert">🎓 Expert</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label>Ton prénom</label>
+            <input type="text" id="adv-prenom" placeholder="Thomas, Marie...">
+          </div>
+          <div>
+            <label>Longueur des messages</label>
+            <select id="adv-msg-len">
+              <option value="court">Court (3-4 lignes)</option>
+              <option value="moyen" selected>Moyen (6-8 lignes)</option>
+              <option value="long">Long (10-12 lignes)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>Ton offre / Accroche principale</label>
+          <textarea id="adv-offer" placeholder="ex: J'aide les freelances à doubler leurs clients..."></textarea>
+        </div>
+      </div>
+
+      <div class="tab-content" id="gtab-email">
+        <div class="alert alert-blue">📧 Envoi automatique après chaque prospection via ton backend Render.</div>
+        <div class="settings-row">
+          <div><div class="settings-label">Envoi email automatique</div></div>
+          <button class="toggle on" id="toggle-auto-email" onclick="toggleBtn(this)"></button>
+        </div>
+        <div style="margin-top:1rem;">
+          <label>Email expéditeur</label>
+          <input type="email" id="email-from" placeholder="ton@email.com">
+          <label>Nom expéditeur</label>
+          <input type="text" id="email-name" placeholder="Thomas · MarketingBooster">
+          <label>Objet (utilise {nom})</label>
+          <input type="text" id="email-subject" value="💡 {nom}, j'ai quelque chose pour toi">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+            <label style="margin:0;">Délai entre envois</label>
+            <select style="width:140px;margin:0;" id="email-delay">
+              <option value="2">2 sec</option>
+              <option value="5" selected>5 sec</option>
+              <option value="10">10 sec</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div class="log-box" id="log-adv" style="margin-top:1rem;display:none;"></div>
+    <div class="loader" id="loader-adv" style="margin-top:1rem;"><div class="spin"></div><span id="loader-adv-text">Initialisation...</span></div>
+    <div class="progress-wrap" id="progress-wrap-adv" style="display:none;margin-top:0.5rem;">
+      <div class="progress-bar" id="progress-bar-adv" style="width:0%"></div>
+    </div>
+  </div>
+  <!-- ═══════════════ PROSPECTION AVANCÉE ═══════════════ -->
+  <div class="page" id="page-prospection-avancee">
+
+    <div style="margin-bottom:1.5rem;">
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;">✨ Prospection avancée</h2>
+      <p style="color:var(--muted);font-size:0.85rem;margin-top:0.2rem;">Une seule cible, des options activables à la carte selon tes besoins</p>
+    </div>
+
+    <!-- CIBLE PRINCIPALE -->
+    <div class="card">
+      <div class="card-title">🎯 Cible</div>
+      <div class="card-sub">Définis la niche, la localisation, les plateformes et le volume souhaité.</div>
+      <div class="form-row">
+        <div>
+          <label>Niche / Secteur <span style="color:var(--coral);">*</span></label>
+          <input type="text" id="adv2-niche" placeholder="coach fitness, agence SEO, restaurant...">
+        </div>
+        <div>
+          <label>Localisation</label>
+          <input type="text" id="adv2-loc" placeholder="France, Paris, Lyon...">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Nombre de prospects</label>
+          <select id="adv2-count">
+            <option value="25">25 prospects</option>
+            <option value="50" selected>50 prospects</option>
+            <option value="100">100 prospects</option>
+            <option value="200">200 prospects</option>
+            <option value="500">500 prospects</option>
+          </select>
+        </div>
+        <div>
+          <label>Score IA minimum</label>
+          <select id="adv2-score">
+            <option value="0">Tous</option>
+            <option value="5">5+</option>
+            <option value="7" selected>7+</option>
+            <option value="8">8+</option>
+            <option value="9">9+</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Plateformes cibles</label>
+        <div class="platforms-grid" id="adv2-platforms">
+          <div class="plat-chip sel" data-p="tiktok">🎵 TikTok</div>
+          <div class="plat-chip sel" data-p="linkedin">💼 LinkedIn</div>
+          <div class="plat-chip sel" data-p="instagram">📸 Instagram</div>
+          <div class="plat-chip" data-p="google">🔍 Google</div>
+          <div class="plat-chip" data-p="maps">📍 Maps</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPTIONS ACTIVABLES -->
+    <div class="opt-blocks" style="margin-bottom:1.5rem;">
+
+      <!-- IA & Messages -->
+      <div class="opt-block" id="optblock-ia">
+        <div class="opt-block-header" onclick="toggleOptBlock('optblock-ia')">
+          <div style="display:flex;align-items:center;gap:0.8rem;">
+            <div class="opt-check" id="opcheck-ia">✓</div>
+            <div>
+              <div class="opt-block-title">🤖 IA & Messages personnalisés</div>
+              <div class="opt-block-desc">Génère un message sur-mesure pour chaque prospect</div>
+            </div>
+          </div>
+          <span class="opt-arrow" id="optarrow-ia">▾</span>
+        </div>
+        <div class="opt-block-body" id="optbody-ia">
+          <div style="margin-bottom:1rem;">
+            <label>Ton des messages</label>
+            <div class="platforms-grid" id="tone-chips-adv">
+              <div class="plat-chip sel" data-t="professionnel">💼 Professionnel</div>
+              <div class="plat-chip" data-t="casual">😊 Casual</div>
+              <div class="plat-chip" data-t="direct">⚡ Direct</div>
+              <div class="plat-chip" data-t="expert">🎓 Expert</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label>Ton prénom</label>
+              <input type="text" id="adv2-prenom" placeholder="Thomas, Marie...">
+            </div>
+            <div>
+              <label>Longueur des messages</label>
+              <select id="adv2-msg-len">
+                <option value="court">Court (3-4 lignes)</option>
+                <option value="moyen" selected>Moyen (6-8 lignes)</option>
+                <option value="long">Long (10-12 lignes)</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label>Ton offre / Accroche principale</label>
+            <textarea id="adv2-offer" placeholder="ex: J'aide les freelances à doubler leurs clients..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email auto -->
+      <div class="opt-block opt-block-off" id="optblock-email">
+        <div class="opt-block-header" onclick="toggleOptBlock('optblock-email')">
+          <div style="display:flex;align-items:center;gap:0.8rem;">
+            <div class="opt-check opt-check-off" id="opcheck-email">✓</div>
+            <div>
+              <div class="opt-block-title">📧 Envoi email automatique</div>
+              <div class="opt-block-desc">Envoie un email à chaque prospect trouvé via ton backend</div>
+            </div>
+          </div>
+          <span class="opt-arrow" id="optarrow-email">▸</span>
+        </div>
+        <div class="opt-block-body" id="optbody-email" style="display:none;">
+          <div class="alert alert-blue" style="margin-bottom:1rem;">📧 Les emails seront envoyés automatiquement après la prospection.</div>
+          <div class="form-row">
+            <div>
+              <label>Email expéditeur</label>
+              <input type="email" id="adv2-email-from" placeholder="ton@email.com">
+            </div>
+            <div>
+              <label>Nom expéditeur</label>
+              <input type="text" id="adv2-email-name" placeholder="Thomas · MarketingBooster">
+            </div>
+          </div>
+          <div>
+            <label>Objet (utilise {nom})</label>
+            <input type="text" id="adv2-email-subject" value="💡 {nom}, j'ai quelque chose pour toi">
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0;">
+            <label style="margin:0;">Délai entre envois</label>
+            <select style="width:140px;margin:0;" id="adv2-email-delay">
+              <option value="2">2 sec</option>
+              <option value="5" selected>5 sec</option>
+              <option value="10">10 sec</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtres avancés -->
+      <div class="opt-block opt-block-off" id="optblock-filtres">
+        <div class="opt-block-header" onclick="toggleOptBlock('optblock-filtres')">
+          <div style="display:flex;align-items:center;gap:0.8rem;">
+            <div class="opt-check opt-check-off" id="opcheck-filtres">✓</div>
+            <div>
+              <div class="opt-block-title">🔍 Filtres avancés</div>
+              <div class="opt-block-desc">Affine les résultats : followers, email obligatoire, mots-clés exclus</div>
+            </div>
+          </div>
+          <span class="opt-arrow" id="optarrow-filtres">▸</span>
+        </div>
+        <div class="opt-block-body" id="optbody-filtres" style="display:none;">
+          <div class="form-row">
+            <div>
+              <label>Followers min</label>
+              <input type="number" id="adv2-follow-min" placeholder="ex: 500">
+            </div>
+            <div>
+              <label>Followers max</label>
+              <input type="number" id="adv2-follow-max" placeholder="ex: 50000">
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label>Email obligatoire</label>
+              <select id="adv2-email-req">
+                <option value="1">Oui — uniquement avec email</option>
+                <option value="0">Non — tous les profils</option>
+              </select>
+            </div>
+            <div>
+              <label>Exclure déjà contactés</label>
+              <select id="adv2-excl">
+                <option value="1">Oui</option>
+                <option value="0">Non</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label>Mots-clés à exclure</label>
+            <input type="text" id="adv2-exclude-kw" placeholder="recruteur, emploi, offre d'emploi...">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOUTON LANCER -->
+    <button class="btn btn-green" id="btn-launch-adv2" onclick="lancerProspectionAvancee()" style="width:100%;justify-content:center;padding:1rem;">
+      🚀 Lancer la prospection avancée
+    </button>
+
+    <div class="log-box" id="log-adv2" style="margin-top:1rem;display:none;"></div>
+    <div class="loader" id="loader-adv2" style="margin-top:1rem;"><div class="spin"></div><span id="loader-adv2-text">Initialisation...</span></div>
+    <div class="progress-wrap" id="progress-wrap-adv2" style="display:none;margin-top:0.5rem;">
+      <div class="progress-bar" id="progress-bar-adv2" style="width:0%"></div>
+    </div>
+  </div>
+  <!-- ═══════════════ PROSPECTS ═══════════════ -->
+  <div class="page" id="page-prospects">
+    <!-- VUE DOSSIERS -->
+    <div id="view-sessions">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;">📁 Mes Sessions</h2>
+          <p style="color:var(--muted);font-size:0.85rem;margin-top:0.2rem;"><span id="prospect-count">0</span> prospects au total · <span id="session-count">0</span> sessions</p>
+        </div>
+        <div style="display:flex;gap:0.7rem;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="sendAllEmails()">📧 Envoyer à tous</button>
+          <button class="btn btn-green btn-sm" onclick="exportCSV()">📥 Export CSV</button>
+        </div>
+      </div>
+      <div id="sessions-grid"></div>
+    </div>
+
+    <!-- VUE PROSPECTS D'UNE SESSION -->
+    <div id="view-prospects" style="display:none;">
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+        <button class="btn btn-outline btn-sm" onclick="retourSessions()">← Retour</button>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;">
+            <h2 id="session-title" style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;"></h2>
+            <button class="btn btn-outline btn-sm" id="btn-rename" onclick="renamerSession()">✏️ Renommer</button>
+          </div>
+          <p id="session-subtitle" style="color:var(--muted);font-size:0.82rem;margin-top:0.2rem;"></p>
+        </div>
+        <div style="display:flex;gap:0.7rem;flex-wrap:wrap;">
+          <input type="text" style="width:180px;margin:0;padding:0.45rem 0.8rem;font-size:0.82rem;" placeholder="🔍 Rechercher..." id="search-prospects" oninput="filterProspects()">
+          <select style="margin:0;width:130px;padding:0.45rem 0.8rem;font-size:0.82rem;" id="filter-status" onchange="filterProspects()">
+            <option value="">Tous</option>
+            <option value="new">🆕 Non contactés</option>
+            <option value="contacte">📤 Contactés</option>
+            <option value="reponse">💬 Réponse reçue</option>
+            <option value="converti">✅ Convertis</option>
+          </select>
+          <select style="margin:0;width:120px;padding:0.45rem 0.8rem;font-size:0.82rem;" id="filter-platform" onchange="filterProspects()">
+            <option value="">Toutes</option>
+            <option value="tiktok">TikTok</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="instagram">Instagram</option>
+          </select>
+          <button class="btn btn-green btn-sm" onclick="exportSessionCSV()">📥 CSV</button>
+        </div>
+      </div>
+
+      <!-- STATS RAPIDES SESSION -->
+      <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;" id="session-stats-row"></div>
+
+      <div id="prospects-container">
+        <div class="empty-state"><div class="icon">👥</div><p>Aucun prospect dans cette session.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ EMAILS ═══════════════ -->
+  <div class="page" id="page-emails">
+    <div class="card">
+      <div class="card-title">📧 Envoi d'email manuel</div>
+      <div class="card-sub">Envoie un email personnalisé à un prospect via ton backend Render.</div>
+      <div class="form-row">
+        <div>
+          <label>Email destinataire</label>
+          <input type="email" id="send-to" placeholder="prospect@email.com">
+        </div>
+        <div>
+          <label>Nom du destinataire</label>
+          <input type="text" id="send-name" placeholder="Karim M.">
+        </div>
+      </div>
+      <div>
+        <label>Objet</label>
+        <input type="text" id="send-subject" placeholder="Objet de l'email">
+      </div>
+      <div>
+        <label>Corps du message</label>
+        <textarea id="send-body" style="min-height:160px;" placeholder="Écris ton message ici..."></textarea>
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <button class="btn btn-green" onclick="sendEmailManuel()">📧 Envoyer l'email</button>
+        <button class="btn btn-blue btn-sm" onclick="generateEmailIA()">🤖 Générer avec l'IA</button>
+      </div>
+      <div class="loader" id="loader-email"><div class="spin"></div><span>Envoi en cours...</span></div>
+      <div id="email-result" style="margin-top:1rem;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚀 Envoi automatisé à tous mes prospects</div>
+      <div class="card-sub">Envoie un email à tous tes prospects qui ont une adresse email, via ton SMTP configuré. Les prospects déjà contactés sont ignorés par défaut.</div>
+
+      <div id="bulk-smtp-status" style="margin-bottom:1rem;"></div>
+
+      <div class="form-row">
+        <div>
+          <label>Objet (utilise {nom} pour personnaliser)</label>
+          <input type="text" id="bulk-subject" value="💡 {nom}, j'ai quelque chose pour toi">
+        </div>
+        <div>
+          <label>Délai entre chaque envoi</label>
+          <select id="bulk-delay">
+            <option value="2">2 secondes</option>
+            <option value="5" selected>5 secondes</option>
+            <option value="10">10 secondes</option>
+            <option value="30">30 secondes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div>
+          <label>Filtrer</label>
+          <select id="bulk-filter">
+            <option value="unsent">Non envoyés uniquement</option>
+            <option value="all">Tous (même déjà envoyés)</option>
+          </select>
+        </div>
+        <div>
+          <label>Nom expéditeur</label>
+          <input type="text" id="bulk-from-name" placeholder="MarketingBooster">
+        </div>
+      </div>
+
+      <div id="bulk-count-info" style="margin-bottom:1rem;font-size:0.85rem;color:var(--muted);"></div>
+
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-green" onclick="sendAllEmailsBulk()">🚀 Envoyer à tous via SMTP</button>
+        <button class="btn btn-outline btn-sm" onclick="refreshBulkInfo()">🔄 Actualiser le compteur</button>
+        <button class="btn btn-outline btn-sm" onclick="testSmtpNow()">🔌 Tester SMTP</button>
+      </div>
+
+      <div class="loader" id="loader-bulk"><div class="spin"></div><span id="loader-bulk-text">Envoi en cours...</span></div>
+      <div class="progress-wrap" id="progress-wrap-bulk" style="display:none;margin-top:0.5rem;">
+        <div class="progress-bar" id="progress-bar-bulk" style="width:0%"></div>
+      </div>
+      <div class="log-box" id="log-bulk" style="margin-top:1rem;display:none;"></div>
+      <div id="bulk-result" style="margin-top:1rem;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📬 Historique des envois</div>
+      <div class="card-sub">Tous les emails envoyés via le dashboard.</div>
+      <div id="email-history">
+        <div class="empty-state"><div class="icon">📭</div><p>Aucun email envoyé pour l'instant.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SÉQUENCES ═══════════════ -->
+  <div class="page" id="page-sequences">
+    <div class="card">
+      <div class="card-title">⚡ Séquences email automatisées</div>
+      <div class="card-sub">Crée des séquences de relance automatique pour tes prospects.</div>
+
+      <div class="alert alert-blue">⚡ Configure une séquence : email J0 → relance J+3 → relance J+7</div>
+
+      <div class="form-row">
+        <div>
+          <label>Nom de la séquence</label>
+          <input type="text" id="seq-name" placeholder="Séquence Coaches Fitness">
+        </div>
+        <div>
+          <label>Délai entre chaque email</label>
+          <select id="seq-delay">
+            <option value="1">1 jour</option>
+            <option value="3" selected>3 jours</option>
+            <option value="7">7 jours</option>
+          </select>
+        </div>
+      </div>
+
+      <label>Email 1 — Premier contact</label>
+      <textarea id="seq-e1" placeholder="Message de premier contact..." style="min-height:100px;"></textarea>
+      <label>Email 2 — Relance #1</label>
+      <textarea id="seq-e2" placeholder="Relance douce, ajouter valeur..." style="min-height:80px;"></textarea>
+      <label>Email 3 — Relance finale</label>
+      <textarea id="seq-e3" placeholder="Dernière tentative, urgence soft..." style="min-height:80px;"></textarea>
+
+      <button class="btn btn-green" onclick="saveSequence()">💾 Sauvegarder la séquence</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Séquences sauvegardées</div>
+      <div id="sequences-list">
+        <div class="empty-state"><div class="icon">⚡</div><p>Aucune séquence créée.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ STATS ═══════════════ -->
+  <div class="page" id="page-stats">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="num g" id="s-total">0</div>
+        <div class="lbl">Total prospects</div>
+      </div>
+      <div class="stat-card">
+        <div class="num b" id="s-emails">0</div>
+        <div class="lbl">Emails envoyés</div>
+      </div>
+      <div class="stat-card">
+        <div class="num c" id="s-sessions">0</div>
+        <div class="lbl">Sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="num p" id="s-avg">—</div>
+        <div class="lbl">Score IA moyen</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Répartition par plateforme</div>
+      <div id="stats-platforms">
+        <div class="empty-state"><div class="icon">📊</div><p>Lance une prospection pour voir les stats.</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Log complet</div>
+      <div class="log-box" id="stats-log">Aucun log disponible.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ EXPORT ═══════════════ -->
+  <div class="page" id="page-export">
+    <div class="card">
+      <div class="card-title">📥 Exporter tes prospects</div>
+      <div class="card-sub">Exporte tes données dans le format de ton choix, avec tous les champs disponibles.</div>
+      <div class="form-row">
+        <div>
+          <label>Format d'export</label>
+          <select id="export-format">
+            <option value="csv">CSV (Excel, Google Sheets)</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+        <div>
+          <label>Filtrer par score minimum</label>
+          <select id="export-score">
+            <option value="0">Tous</option>
+            <option value="7">7+ seulement</option>
+            <option value="8">8+ seulement</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <button class="btn btn-dark" onclick="exportData()">📥 Télécharger l'export</button>
+        <button class="btn btn-outline btn-sm" onclick="copyJSON()">📋 Copier JSON</button>
+      </div>
+      <div id="export-preview" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SETTINGS ═══════════════ -->
+  <div class="page" id="page-settings">
+    <div class="card">
+      <div class="card-title">🟠 Clé API Mistral</div>
+      <div class="card-sub">Mistral est le moteur principal de génération de prospects.</div>
+      <label>Clé API Mistral · <a href="https://console.mistral.ai/api-keys" target="_blank" style="color:var(--green);">Gérer mes clés →</a></label>
+      <input type="password" id="setting-mistral-key" placeholder="••••••••••••••••••••••••••••••••" value="E4vLkxXplCVYrtQIowwzozVmOnv4INic">
+      <div id="mistral-quota-bar" style="margin-top:0.8rem;padding:0.8rem 1rem;background:var(--surface);border-radius:12px;border:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <span style="font-size:0.82rem;font-weight:700;">Utilisation estimée ce mois</span>
+          <span id="mistral-quota-pct" style="font-size:0.82rem;color:var(--green);font-weight:700;">—</span>
+        </div>
+        <div style="background:var(--border);border-radius:100px;height:6px;">
+          <div id="mistral-quota-fill" style="height:6px;border-radius:100px;background:var(--green);width:0%;transition:width 0.5s;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:0.4rem;">
+          <span id="mistral-quota-calls" style="font-size:0.75rem;color:var(--muted);">— appels effectués</span>
+          <span id="mistral-quota-tokens" style="font-size:0.75rem;color:var(--muted);">— tokens estimés</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.8rem;margin-top:0.8rem;flex-wrap:wrap;">
+        <button class="btn btn-green" onclick="saveMistralKey()">💾 Sauvegarder</button>
+        <button class="btn btn-outline btn-sm" onclick="testMistralKey()">🔌 Tester la clé</button>
+        <button class="btn btn-outline btn-sm" onclick="resetMistralQuota()">🔄 Réinitialiser compteur</button>
+      </div>
+      <div id="mistral-test-result" style="margin-top:0.8rem;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚙️ Configuration Backend</div>
+      <div class="card-sub">Connecte-toi à ton backend Render pour activer la prospection et les emails.</div>
+      <label>URL de ton backend Render</label>
+      <input type="text" id="setting-backend" placeholder="https://marketing-booster-backend-2.onrender.com" value="https://marketing-booster-backend-2.onrender.com">
+      <label>🟡 Clé API Gemini — <strong>GRATUIT</strong> · <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--green);">Obtenir ici</a></label>
+      <input type="password" id="setting-gemini-key" placeholder="AIza...">
+      <label>Clé API Anthropic (optionnel, fallback)</label>
+      <input type="password" id="setting-api-key" placeholder="sk-ant-...">
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <button class="btn btn-green" onclick="saveSettings()">💾 Sauvegarder</button>
+        <button class="btn btn-outline btn-sm" onclick="testBackend()">🔌 Tester la connexion</button>
+      </div>
+      <div id="settings-result" style="margin-top:1rem;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📧 Config Email (Nodemailer)</div>
+      <div class="card-sub">Ces paramètres sont envoyés à ton backend Render pour l'envoi d'emails.</div>
+      <div class="form-row">
+        <div>
+          <label>SMTP Host</label>
+          <input type="text" id="smtp-host" placeholder="smtp.gmail.com">
+        </div>
+        <div>
+          <label>SMTP Port</label>
+          <input type="number" id="smtp-port" placeholder="587" value="587">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Email</label>
+          <input type="email" id="smtp-user" placeholder="ton@gmail.com">
+        </div>
+        <div>
+          <label>Mot de passe / App Password</label>
+          <input type="password" id="smtp-pass" placeholder="••••••••">
+        </div>
+      </div>
+      <button class="btn btn-blue" onclick="saveSmtp()">💾 Sauvegarder SMTP</button>
+      <div id="smtp-result" style="margin-top:1rem;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗑️ Données</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Vider tous les prospects</div>
+          <div class="settings-desc">Supprime tous les prospects sauvegardés localement</div>
+        </div>
+        <button class="btn btn-coral btn-sm" onclick="clearAll()">🗑️ Vider</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let BACKEND = localStorage.getItem('mb_backend') || 'https://marketing-booster-backend-2.onrender.com';
+let MISTRAL_KEY = localStorage.getItem('mb_mistral_key') || 'E4vLkxXplCVYrtQIowwzozVmOnv4INic';
+let OPENROUTER_KEY = localStorage.getItem('mb_openrouter_key') || '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';
+let GEMINI_KEY = localStorage.getItem('mb_gemini_key') || '';
+let API_KEY = localStorage.getItem('mb_api_key') || '';
+const MISTRAL_KEYS_DEFAULT = [
+  'E4vLkxXplCVYrtQIowwzozVmOnv4INic',
+  '5DyUx1KNRRbmqXt1nPq7550779U0Ak8F',
+  'NxKOZd3odz9a49CjbZrAqs1O8OMRvBc3',
+  'abEAlDJZOBU5pthIuxjTwkKoLOaUZy0Y',
+  'tAlOgBOYLTiDpHSxJVvtzudxdN6Dq6wn',
+  'rgvAmwX9vR7f862GHiuCS1mQmvgpLOvL',
+  'mSyBW1ScTsoGtNKYqbZhQtWcAeJ9pk6j',
+  'NCG9b23kXG7rqgk266FLaD2K7wS9XPNp',
+  'PSAJTmWzhsLKD80WAkLqEaBUdhEpGp3f',
+  'iCnwx4X6MK36pBPGNsVuD8TK1LLGjoNp',
+  'INxBndIE4hkrZuXSxgu6IAfghRLn43sD',
+  'XVPXQq1qUmtxFV7VOWHboIGNj4Ntfg6D',
+  'ZdnHt9u56II2RHbvwK0GD7S402org83o',
+  'n8sf1KsDZlaJy9Mv6uv1yoclPZ1WomFL',
+  'g10BGhjgqshZ3TyPF2JbpzfaciqyISkY',
+  'MMyKdVtQFTdFbMffRXdLnhyV6BR5XM7H',
+  'YaH968X1uenpRPFJqV6Dhoc2CC5ZUDn7',
+  'TTxhMalHkSJUwvFmvUjj1FuIF86F51oY',
+  'YNT3phmGBULXOsa0tpSYh0IaP3hSD6ay',
+  'W9Cb7g6qC648MrRRkjcWc1Gwhn5lCGK6'
+];
+let MISTRAL_KEYS = JSON.parse(localStorage.getItem('mb_mistral_keys') || JSON.stringify(MISTRAL_KEYS_DEFAULT));
+let mistralKeyIndex = parseInt(localStorage.getItem('mb_mistral_key_index') || '0');
+
+function getNextMistralKey() {
+  const key = MISTRAL_KEYS[mistralKeyIndex % MISTRAL_KEYS.length];
+  mistralKeyIndex = (mistralKeyIndex + 1) % MISTRAL_KEYS.length;
+  localStorage.setItem('mb_mistral_key_index', mistralKeyIndex);
+  return key || MISTRAL_KEYS[0];
+}
+let prospects = JSON.parse(localStorage.getItem('mb_prospects') || '[]');
+let emailLog  = JSON.parse(localStorage.getItem('mb_emails') || '[]');
+let sequences = JSON.parse(localStorage.getItem('mb_sequences') || '[]');
+let sessions  = parseInt(localStorage.getItem('mb_sessions') || '0');
+let prospectsessions = JSON.parse(localStorage.getItem('mb_prospect_sessions') || '[]');
+let currentSessionId = null;
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+function goTo(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.toLowerCase().includes(id === 'dashboard' ? 'dashboard' : id)) n.classList.add('active');
+  });
+  if (id === 'prospects') { renderSessions(); }
+  if (id === 'settings') { updateMistralQuotaUI(); }
+  if (id === 'prospection') { renderConfigs(); }
+  if (id === 'stats') renderStats();
+  if (id === 'sequences') renderSequences();
+  if (id === 'emails') { renderEmailHistory(); setTimeout(refreshBulkInfo, 100); }
+  closeSidebar();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function switchTab(tabId, groupId) {
+  const parent = document.getElementById(tabId).closest('.card') || document.body;
+  parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════
+//  PLATFORM CHIPS
+// ═══════════════════════════════════════════════════════
+document.querySelectorAll('.plat-chip[data-p]').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('sel'));
+});
+document.querySelectorAll('.plat-chip[data-t]').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.plat-chip[data-t]').forEach(c => c.classList.remove('sel'));
+    chip.classList.add('sel');
+  });
+});
+
+function getSelectedPlatforms(containerId) {
+  return [...document.querySelectorAll(`#${containerId} .plat-chip.sel`)].map(c => c.dataset.p);
+}
+
+// ═══════════════════════════════════════════════════════
+//  LOG
+// ═══════════════════════════════════════════════════════
+function log(msg, type = 'info', target = 'global-log') {
+  const now = new Date().toLocaleTimeString('fr');
+  // Toujours logger dans global-log
+  const globalEl = document.getElementById('global-log');
+  if (globalEl) {
+    globalEl.innerHTML += `<span class="${type}">[${now}] ${msg}</span><br>`;
+    globalEl.scrollTop = globalEl.scrollHeight;
+  }
+  // Logger aussi dans la cible spécifique si différente
+  if (target !== 'global-log') {
+    const el = document.getElementById(target);
+    if (el) {
+      el.style.display = 'block';
+      el.innerHTML += `<span class="${type}">[${now}] ${msg}</span><br>`;
+      el.scrollTop = el.scrollHeight;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  BACKEND STATUS
+// ═══════════════════════════════════════════════════════
+async function checkBackend() {
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-text');
+  try {
+    const r = await fetch(BACKEND + '/health', { signal: AbortSignal.timeout(8000) });
+    if (r.ok) {
+      dot.style.background = 'var(--green)';
+      txt.textContent = 'Backend OK';
+      log('Backend Render connecté ✓', 'ok');
+    } else {
+      dot.style.background = 'var(--amber)';
+      txt.textContent = 'Backend dégradé';
+      log('Backend répond mais avec erreur', 'warn');
+    }
+  } catch(e) {
+    dot.style.background = 'var(--coral)';
+    txt.textContent = 'Backend hors ligne';
+    log('Backend inaccessible — mode simulation activé', 'warn');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  MULTI-CONFIGS PROSPECTION
+// ═══════════════════════════════════════════════════════
+let configs = JSON.parse(localStorage.getItem('mb_configs') || '[]');
+
+
+// ═══════════════════════════════════════════════════════
+//  MISTRAL QUOTA TRACKER
+// ═══════════════════════════════════════════════════════
+let mistralUsage = JSON.parse(localStorage.getItem('mb_mistral_usage') || '{"calls":0,"tokens":0,"month":""}');
+
+function getMistralMonth() {
+  const d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth()+1);
+}
+
+function trackMistralCall(tokensEstimated) {
+  const month = getMistralMonth();
+  if (mistralUsage.month !== month) {
+    mistralUsage = { calls: 0, tokens: 0, month };
+  }
+  mistralUsage.calls++;
+  mistralUsage.tokens += tokensEstimated || 800;
+  localStorage.setItem('mb_mistral_usage', JSON.stringify(mistralUsage));
+  updateMistralQuotaUI();
+}
+
+function updateMistralQuotaUI() {
+  const month = getMistralMonth();
+  if (mistralUsage.month !== month) mistralUsage = { calls: 0, tokens: 0, month };
+  // Mistral free tier: ~500k tokens/mois
+  const FREE_LIMIT = 500000;
+  const pct = Math.min(Math.round((mistralUsage.tokens / FREE_LIMIT) * 100), 100);
+  const fill = document.getElementById('mistral-quota-fill');
+  const pctEl = document.getElementById('mistral-quota-pct');
+  const callsEl = document.getElementById('mistral-quota-calls');
+  const tokensEl = document.getElementById('mistral-quota-tokens');
+  if (!fill) return;
+  fill.style.width = pct + '%';
+  fill.style.background = pct > 80 ? 'var(--coral)' : pct > 50 ? '#f59e0b' : 'var(--green)';
+  pctEl.textContent = pct + '%';
+  pctEl.style.color = pct > 80 ? 'var(--coral)' : pct > 50 ? '#f59e0b' : 'var(--green)';
+  callsEl.textContent = mistralUsage.calls + ' appels effectués';
+  tokensEl.textContent = (mistralUsage.tokens).toLocaleString('fr') + ' tokens estimés';
+}
+
+function resetMistralQuota() {
+  mistralUsage = { calls: 0, tokens: 0, month: getMistralMonth() };
+  localStorage.setItem('mb_mistral_usage', JSON.stringify(mistralUsage));
+  updateMistralQuotaUI();
+}
+
+function saveMistralKey() {
+  const key = document.getElementById('setting-mistral-key').value.trim();
+  if (!key) { alert('Entre une clé valide'); return; }
+  MISTRAL_KEY = key;
+  localStorage.setItem('mb_mistral_key', key);
+  document.getElementById('mistral-test-result').innerHTML = '<span style="color:var(--green);">✅ Clé sauvegardée</span>';
+}
+
+async function testMistralKey() {
+  const key = document.getElementById('setting-mistral-key').value.trim() || MISTRAL_KEY;
+  const res_el = document.getElementById('mistral-test-result');
+  res_el.innerHTML = '⏳ Test en cours...';
+  try {
+    const res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({ model: 'mistral-small-latest', messages: [{ role: 'user', content: 'Réponds juste "ok"' }], max_tokens: 10 }),
+      signal: AbortSignal.timeout(15000)
+    });
+    if (res.status === 401) { res_el.innerHTML = '<span style="color:var(--coral);">❌ Clé invalide ou expirée</span>'; return; }
+    if (res.status === 429) { res_el.innerHTML = '<span style="color:var(--coral);">🚫 Quota dépassé — <a href="https://console.mistral.ai" target="_blank" style="color:var(--coral);">Voir mon plan →</a></span>'; return; }
+    if (res.status === 402) { res_el.innerHTML = '<span style="color:var(--coral);">💳 Crédit insuffisant — <a href="https://console.mistral.ai" target="_blank" style="color:var(--coral);">Recharger →</a></span>'; return; }
+    const data = await res.json();
+    if (data.choices?.[0]?.message?.content) {
+      res_el.innerHTML = '<span style="color:var(--green);">✅ Clé valide — Mistral opérationnel !</span>';
+    } else {
+      res_el.innerHTML = '<span style="color:var(--coral);">⚠️ Réponse inattendue : ' + JSON.stringify(data).substring(0,100) + '</span>';
+    }
+  } catch(e) {
+    res_el.innerHTML = '<span style="color:var(--coral);">❌ Erreur : ' + e.message + '</span>';
+  }
+}
+
+
+function toggleOptBlock(blockId) {
+  const block = document.getElementById(blockId);
+  const suffix = blockId.replace('optblock-', '');
+  const check = document.getElementById('opcheck-' + suffix);
+  const arrow = document.getElementById('optarrow-' + suffix);
+  const body = document.getElementById('optbody-' + suffix);
+  const isOff = block.classList.contains('opt-block-off');
+
+  if (isOff) {
+    // Activate
+    block.classList.remove('opt-block-off');
+    check.classList.remove('opt-check-off');
+    arrow.textContent = '▾';
+    body.style.display = 'block';
+    // Special: toggle-auto-email flag
+    if (suffix === 'email') {
+      const tog = document.getElementById('toggle-auto-email');
+      if (tog) tog.dataset.on = 'true';
+    }
+  } else {
+    // Deactivate
+    block.classList.add('opt-block-off');
+    check.classList.add('opt-check-off');
+    arrow.textContent = '▸';
+    body.style.display = 'none';
+    if (suffix === 'email') {
+      const tog = document.getElementById('toggle-auto-email');
+      if (tog) tog.dataset.on = 'false';
+    }
+  }
+}
+
+function switchTabGlobal(tabId) {
+  document.querySelectorAll('#gtab-ia,#gtab-email').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#tabs-global .tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function sauvegarderConfigs() {
+  localStorage.setItem('mb_configs', JSON.stringify(configs));
+}
+
+function ajouterConfig(data) {
+  const id = 'cfg_' + Date.now();
+  const cfg = data || {
+    id, nom: 'Cible ' + (configs.length + 1),
+    niche: '', location: '', lang: 'fr',
+    platforms: ['tiktok','linkedin','instagram'],
+    count: 50, minScore: 7,
+    followMin: '', followMax: '',
+    excludeKw: '', status: 'wait'
+  };
+  if (!data) configs.push(cfg);
+  renderConfigs();
+  sauvegarderConfigs();
+}
+
+function supprimerConfig(id) {
+  configs = configs.filter(c => c.id !== id);
+  renderConfigs();
+  sauvegarderConfigs();
+}
+
+function dupliquerConfig(id) {
+  const src = configs.find(c => c.id === id);
+  if (!src) return;
+  const newCfg = { ...src, id: 'cfg_' + Date.now(), nom: src.nom + ' (copie)', status: 'wait' };
+  configs.push(newCfg);
+  renderConfigs();
+  sauvegarderConfigs();
+}
+
+function lireConfig(id) {
+  const cfg = configs.find(c => c.id === id);
+  if (!cfg) return;
+  cfg.niche = document.getElementById('niche_' + id)?.value || cfg.niche;
+  cfg.location = document.getElementById('loc_' + id)?.value || cfg.location;
+  cfg.lang = document.getElementById('lang_' + id)?.value || cfg.lang;
+  cfg.count = parseInt(document.getElementById('count_' + id)?.value || cfg.count);
+  cfg.minScore = parseInt(document.getElementById('score_' + id)?.value || cfg.minScore);
+  cfg.followMin = document.getElementById('fmin_' + id)?.value || '';
+  cfg.followMax = document.getElementById('fmax_' + id)?.value || '';
+  cfg.excludeKw = document.getElementById('exkw_' + id)?.value || '';
+  cfg.platforms = [...document.querySelectorAll('#plats_' + id + ' .config-plat.sel')].map(el => el.dataset.p);
+  cfg.nom = cfg.niche || cfg.nom;
+  sauvegarderConfigs();
+}
+
+function renderConfigs() {
+  const container = document.getElementById('configs-container');
+  if (!configs.length) {
+    container.innerHTML = `<div class="card" style="text-align:center;padding:2.5rem 1rem;color:var(--muted);">
+      <div style="font-size:2.5rem;margin-bottom:0.8rem;">🎯</div>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:0.4rem;color:var(--text);">Aucune cible configurée</div>
+      <p style="font-size:0.85rem;">Clique sur <strong>+ Ajouter une cible</strong> pour démarrer.</p>
+    </div>`;
+    return;
+  }
+  const plats = ['tiktok','linkedin','instagram','google','maps'];
+  const platLabels = { tiktok:'🎵 TikTok', linkedin:'💼 LinkedIn', instagram:'📸 Instagram', google:'🔍 Google', maps:'📍 Maps' };
+  const statusMeta = {
+    wait: { label:'En attente', cls:'wait' },
+    run:  { label:'⚡ En cours', cls:'run' },
+    done: { label:'✅ Terminé', cls:'done' },
+    err:  { label:'❌ Erreur', cls:'err' }
+  };
+
+  container.innerHTML = configs.map((cfg, i) => {
+    const id = cfg.id;
+    const sm = statusMeta[cfg.status] || statusMeta.wait;
+    return `
+    <div class="config-card ${cfg.status === 'done' ? 'done' : cfg.status === 'run' ? 'running' : ''}" id="card_${id}" style="margin-bottom:1rem;">
+
+      <!-- En-tête de la carte -->
+      <div class="config-header">
+        <div style="display:flex;align-items:center;gap:0.7rem;flex:1;min-width:0;">
+          <div class="config-num">${i+1}</div>
+          <div style="min-width:0;">
+            <div class="config-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cfg.niche || 'Nouvelle cible'}</div>
+            <div style="font-size:0.72rem;color:var(--muted);margin-top:0.1rem;">${cfg.platforms.map(p=>platLabels[p]||p).join(' · ')}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+          <span class="config-status ${sm.cls}">${sm.label}</span>
+          <button class="btn btn-outline btn-sm" style="padding:0.35rem 0.7rem;" onclick="dupliquerConfig('${id}')" title="Dupliquer">⧉</button>
+          <button class="btn btn-sm" style="color:var(--coral);border:1.5px solid var(--coral);background:transparent;border-radius:100px;padding:0.35rem 0.65rem;cursor:pointer;font-size:0.75rem;" onclick="supprimerConfig('${id}')" title="Supprimer">🗑</button>
+        </div>
+      </div>
+
+      <!-- Champs essentiels (toujours visibles) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-top:0.8rem;">
+        <div class="config-field">
+          <label>🎯 Niche / Secteur <span style="color:var(--coral);">*</span></label>
+          <input type="text" id="niche_${id}" value="${cfg.niche||''}" placeholder="coach fitness, agence SEO..." onchange="lireConfig('${id}')">
+        </div>
+        <div class="config-field">
+          <label>📍 Localisation</label>
+          <input type="text" id="loc_${id}" value="${cfg.location||''}" placeholder="France, Paris..." onchange="lireConfig('${id}')">
+        </div>
+        <div class="config-field">
+          <label>📊 Nombre de prospects</label>
+          <select id="count_${id}" onchange="lireConfig('${id}')">
+            ${[25,50,100,200,500].map(n => `<option value="${n}"${cfg.count===n?' selected':''}>${n} prospects</option>`).join('')}
+          </select>
+        </div>
+        <div class="config-field">
+          <label>⭐ Score IA minimum</label>
+          <select id="score_${id}" onchange="lireConfig('${id}')">
+            ${[[0,'Tous'],[5,'5+'],[7,'7+'],[8,'8+'],[9,'9+']].map(([v,l]) => `<option value="${v}"${cfg.minScore===v?' selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <!-- Plateformes -->
+      <div style="margin-top:0.9rem;">
+        <label style="font-size:0.78rem;margin-bottom:0.45rem;display:block;">🌐 Plateformes cibles</label>
+        <div class="config-plats" id="plats_${id}">
+          ${plats.map(p => `<div class="config-plat${cfg.platforms.includes(p)?' sel':''}" data-p="${p}" onclick="togglePlat(this,'${id}')">${platLabels[p]}</div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Options avancées (toggle) -->
+      <div style="margin-top:0.9rem;">
+        <button class="btn btn-outline btn-sm" style="font-size:0.78rem;padding:0.35rem 0.9rem;" onclick="toggleCfgOpts('${id}')">
+          <span id="cfgopts-arrow-${id}">▸</span> Options avancées
+        </button>
+        <div id="cfgopts-${id}" style="display:none;margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--border);">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+            <div class="config-field">
+              <label>🌍 Langue</label>
+              <select id="lang_${id}" onchange="lireConfig('${id}')">
+                <option value="fr"${cfg.lang==='fr'?' selected':''}>🇫🇷 Français</option>
+                <option value="en"${cfg.lang==='en'?' selected':''}>🇬🇧 Anglais</option>
+                <option value="es"${cfg.lang==='es'?' selected':''}>🇪🇸 Espagnol</option>
+              </select>
+            </div>
+            <div class="config-field">
+              <label>👥 Followers min / max</label>
+              <div style="display:flex;gap:0.4rem;">
+                <input type="number" id="fmin_${id}" value="${cfg.followMin||''}" placeholder="min" style="margin:0;flex:1;" onchange="lireConfig('${id}')">
+                <input type="number" id="fmax_${id}" value="${cfg.followMax||''}" placeholder="max" style="margin:0;flex:1;" onchange="lireConfig('${id}')">
+              </div>
+            </div>
+          </div>
+          <div class="config-field" style="margin-top:0.5rem;">
+            <label>🚫 Mots-clés à exclure</label>
+            <input type="text" id="exkw_${id}" value="${cfg.excludeKw||''}" placeholder="recruteur, emploi, offre d'emploi..." style="margin:0;" onchange="lireConfig('${id}')">
+          </div>
+        </div>
+      </div>
+
+      ${cfg.result ? `<div style="margin-top:0.9rem;padding:0.6rem 1rem;background:rgba(0,196,122,0.08);border-radius:10px;font-size:0.82rem;color:var(--green);font-weight:700;">✅ ${cfg.result} prospects trouvés dans cette session</div>` : ''}
+
+      <!-- Bouton lancer individuel -->
+      <div style="margin-top:1rem;display:flex;justify-content:flex-end;">
+        <button class="btn btn-green btn-sm" onclick="lancerUneConfig('${id}')">🚀 Lancer cette cible</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCfgOpts(id) {
+  const body = document.getElementById('cfgopts-' + id);
+  const arrow = document.getElementById('cfgopts-arrow-' + id);
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    arrow.textContent = '▾';
+  } else {
+    body.style.display = 'none';
+    arrow.textContent = '▸';
+  }
+}
+
+async function lancerUneConfig(id) {
+  lireConfig(id);
+  const cfg = configs.find(c => c.id === id);
+  if (!cfg || !cfg.niche.trim()) { alert('Configure une niche pour cette cible !'); return; }
+  // Temporarily run only this config
+  const allConfigs = configs;
+  configs = [cfg];
+  await lancerToutesConfigs();
+  configs = allConfigs;
+  renderConfigs();
+}
+
+function togglePlat(el, cfgId) {
+  el.classList.toggle('sel');
+  lireConfig(cfgId);
+}
+
+async function lancerToutesConfigs() {
+  // Lire toutes les configs avant de lancer
+  configs.forEach(c => lireConfig(c.id));
+  const valides = configs.filter(c => c.niche.trim());
+  if (!valides.length) { alert('Configure au moins une cible avec une niche !'); return; }
+
+  const btn = document.getElementById('btn-launch-all');
+  btn.disabled = true;
+  const logAdvEl = document.getElementById('log-adv');
+  if (logAdvEl) { logAdvEl.style.display = 'block'; logAdvEl.innerHTML = ''; }
+  const progressEl = document.getElementById('progress-wrap-adv');
+  if (progressEl) progressEl.style.display = 'block';
+  const loaderEl = document.getElementById('loader-adv');
+  if (loaderEl) loaderEl.classList.add('active');
+
+  const globalPayload = {
+    tone: document.querySelector('#tone-chips .plat-chip.sel')?.dataset.t || 'professionnel',
+    offer: document.getElementById('adv-offer')?.value || '',
+    prenom: document.getElementById('adv-prenom')?.value || '',
+    msgLen: document.getElementById('adv-msg-len')?.value || 'moyen',
+    msgType: 'email',
+    autoEmail: document.getElementById('toggle-auto-email')?.dataset?.on === 'true' || document.getElementById('toggle-auto-email')?.classList?.contains('on'),
+    emailFrom: document.getElementById('email-from')?.value || '',
+    emailName: document.getElementById('email-name')?.value || '',
+    emailSubject: document.getElementById('email-subject')?.value || '',
+    emailDelay: parseInt(document.getElementById('email-delay')?.value || 5),
+  };
+
+  log('🚀 Lancement de ' + valides.length + ' cible(s) en séquence...', 'info', 'log-adv');
+
+  let totalTrouve = 0;
+  for (let i = 0; i < valides.length; i++) {
+    const cfg = valides[i];
+    cfg.status = 'run';
+    renderConfigs();
+
+    log('📦 Cible ' + (i+1) + '/' + valides.length + ' : "' + cfg.niche + '"', 'info', 'log-adv');
+    document.getElementById('loader-adv-text').textContent = 'Cible ' + (i+1) + '/' + valides.length + ' : ' + cfg.niche;
+
+    const payload = {
+      ...globalPayload,
+      niche: cfg.niche,
+      location: cfg.location,
+      lang: cfg.lang,
+      platforms: cfg.platforms,
+      count: cfg.count,
+      minScore: cfg.minScore,
+      followMin: cfg.followMin,
+      followMax: cfg.followMax,
+      excludeKw: cfg.excludeKw,
+      emailRequired: true,
+      excludeContacted: true
+    };
+
+    try {
+      // Batches SÉQUENTIELS jusqu'à atteindre le bon nombre
+      const batchSize = 20;
+      let allP = [];
+      let echecs = 0;
+
+      while (allP.length < cfg.count && echecs < 3) {
+        const restant = cfg.count - allP.length;
+        log('📦 Batch ' + (Math.floor(allP.length/batchSize)+1) + ' — ' + allP.length + '/' + cfg.count + ' prospects...', 'info', 'log-adv');
+        const r = await genererProspectsIA({ ...payload, count: Math.min(batchSize, restant) }, 'log-adv');
+        if (r?.prospects?.length) {
+          allP = [...allP, ...r.prospects];
+          echecs = 0;
+          log('✅ ' + allP.length + '/' + cfg.count + ' prospects obtenus', 'ok', 'log-adv');
+        } else {
+          echecs++;
+          log('⚠️ Batch vide (' + echecs + '/3 échecs)', 'warn', 'log-adv');
+        }
+        const pct = Math.round(((i + allP.length / cfg.count) / valides.length) * 95);
+        document.getElementById('progress-bar-adv').style.width = pct + '%';
+        if (allP.length < cfg.count && echecs < 3) await new Promise(res => setTimeout(res, 700));
+      }
+
+      // Sauvegarder en session
+      const sessionId = 'session_' + Date.now();
+      const sessionDate = new Date().toLocaleDateString('fr');
+      const sessionName = cfg.niche + ' · ' + sessionDate;
+      const newProspects = allP.map(p => ({
+        ...p,
+        id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2,6),
+        sessionId, date: sessionDate,
+        sent:false, contacte:false, reponse:false, converti:false
+      }));
+      prospectsessions = [{ id:sessionId, name:sessionName, niche:cfg.niche, date:sessionDate, dateTs:Date.now(), count:newProspects.length, platforms:cfg.platforms }, ...prospectsessions];
+      localStorage.setItem('mb_prospect_sessions', JSON.stringify(prospectsessions));
+      prospects = [...newProspects, ...prospects];
+      saveProspects();
+
+      cfg.status = 'done';
+      cfg.result = allP.length;
+      totalTrouve += allP.length;
+      log('✅ Cible "' + cfg.niche + '" : ' + allP.length + ' prospects sauvegardés', 'ok', 'log-adv');
+
+      if (globalPayload.autoEmail && globalPayload.emailFrom) {
+        log('📧 Envoi emails pour "' + cfg.niche + '"...', 'info', 'log-adv');
+        await envoyerEmailsBulk(newProspects, globalPayload, 'log-adv');
+      }
+    } catch(e) {
+      cfg.status = 'err';
+      log('❌ Erreur cible "' + cfg.niche + '" : ' + e.message, 'err', 'log-adv');
+    }
+
+    renderConfigs();
+    sauvegarderConfigs();
+    sessions++;
+    localStorage.setItem('mb_sessions', sessions);
+    if (i < valides.length - 1) await new Promise(res => setTimeout(res, 1000));
+  }
+
+  document.getElementById('progress-bar-adv').style.width = '100%';
+  document.getElementById('loader-adv').classList.remove('active');
+  btn.disabled = false;
+  updateDashboard();
+  renderDashboardRecent();
+  log('🎉 Terminé ! ' + totalTrouve + ' prospects au total trouvés.', 'ok', 'log-adv');
+  setTimeout(() => goTo('prospects'), 1500);
+}
+
+// ═══════════════════════════════════════════════════════
+//  PROSPECTION PRINCIPALE
+// ═══════════════════════════════════════════════════════
+function toggleQuickAdvanced() {
+  const panel = document.getElementById('quick-advanced');
+  const btn = document.getElementById('btn-quick-adv');
+  const open = panel.style.display === 'none';
+  panel.style.display = open ? 'block' : 'none';
+  btn.textContent = open ? '⚙️ Masquer les options' : '⚙️ Options avancées';
+}
+
+async function lancerProspection(mode) {
+  const isAdv = mode === 'adv';
+  const niche = isAdv
+    ? document.getElementById('adv-niche').value.trim()
+    : document.getElementById('quick-niche').value.trim();
+
+  if (!niche) { alert('🎯 Indique une niche / secteur cible !'); return; }
+
+  const plateformes = getSelectedPlatforms(isAdv ? 'adv-platforms' : 'quick-platforms');
+  if (!plateformes.length) { alert('Sélectionne au moins une plateforme !'); return; }
+
+  const btnId = isAdv ? 'btn-launch-adv' : 'btn-launch-quick';
+  const loaderId = isAdv ? 'loader-adv' : 'loader-quick';
+  const loaderTxtId = isAdv ? 'loader-adv-text' : 'loader-quick-text';
+  const progressWrapId = isAdv ? 'progress-wrap-adv' : 'progress-wrap-quick';
+  const progressBarId = isAdv ? 'progress-bar-adv' : 'progress-bar-quick';
+  const logTarget = isAdv ? 'log-adv' : 'global-log';
+
+  const btn = document.getElementById(btnId);
+  btn.disabled = true;
+  document.getElementById(loaderId).classList.add('active');
+  document.getElementById(progressWrapId).style.display = 'block';
+  if (isAdv) document.getElementById('log-adv').style.display = 'block';
+
+  const payload = {
+    niche,
+    location: isAdv ? document.getElementById('adv-loc').value : document.getElementById('quick-loc').value,
+    keywords: isAdv ? document.getElementById('adv-kw')?.value : '',
+    platforms: plateformes,
+    count: isAdv ? parseInt(document.getElementById('adv-count').value) : parseInt(document.getElementById('quick-count')?.value || 50),
+    minScore: isAdv ? parseInt(document.getElementById('adv-score').value) : parseInt(document.getElementById('quick-score')?.value || 7),
+    lang: isAdv ? document.getElementById('adv-lang').value : (document.getElementById('quick-lang')?.value || 'fr'),
+    tone: isAdv ? (document.querySelector('#tone-chips .plat-chip.sel')?.dataset.t || 'professionnel') : 'professionnel',
+    offer: isAdv ? document.getElementById('adv-offer')?.value : '',
+    prenom: isAdv ? document.getElementById('adv-prenom')?.value : '',
+    msgType: isAdv ? document.getElementById('adv-msg-type')?.value : 'email',
+    msgLen: isAdv ? document.getElementById('adv-msg-len')?.value : 'moyen',
+    emailFrom: document.getElementById('email-from')?.value || '',
+    emailName: document.getElementById('email-name')?.value || '',
+    emailSubject: document.getElementById('email-subject')?.value || '',
+    autoEmail: document.getElementById('toggle-auto-email')?.dataset?.on === 'true' || document.getElementById('toggle-auto-email')?.classList?.contains('on'),
+    emailDelay: parseInt(document.getElementById('email-delay')?.value || 5),
+    followMin: isAdv ? document.getElementById('f-follow-min')?.value : (document.getElementById('quick-fmin')?.value || ''),
+    followMax: isAdv ? document.getElementById('f-follow-max')?.value : (document.getElementById('quick-fmax')?.value || ''),
+    emailRequired: isAdv ? document.getElementById('f-email-req')?.value === '1' : true,
+    excludeContacted: isAdv ? document.getElementById('f-excl')?.value === '1' : true,
+    excludeKw: isAdv ? document.getElementById('f-exclude-kw')?.value : (document.getElementById('quick-exkw')?.value || ''),
+  };
+
+  log(`🚀 Lancement prospection : "${niche}" sur [${plateformes.join(', ')}]`, 'info', logTarget);
+
+  // Animation de progression simulée + appel réel
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress = Math.min(progress + Math.random() * 8, 88);
+    document.getElementById(progressBarId).style.width = progress + '%';
+    const steps = [
+      'Initialisation du scraper...',
+      'Connexion aux plateformes...',
+      `Scan ${plateformes[0] || 'TikTok'} en cours...`,
+      'Collecte des profils...',
+      'Analyse IA des prospects...',
+      'Génération des messages personnalisés...',
+      'Calcul des scores de pertinence...',
+      'Finalisation...'
+    ];
+    const stepIdx = Math.floor((progress / 88) * steps.length);
+    document.getElementById(loaderTxtId).textContent = steps[Math.min(stepIdx, steps.length - 1)];
+  }, 600);
+
+  let result = null;
+  try {
+    // Tentative appel backend réel
+    const res = await fetch(BACKEND + '/prospect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(5000)
+    });
+    if (res.ok) {
+      result = await res.json();
+      log('✅ Réponse backend reçue', 'ok', logTarget);
+    } else {
+      throw new Error('Backend error ' + res.status);
+    }
+  } catch(e) {
+    log('⚠️ Backend indisponible — génération IA locale activée', 'warn', logTarget);
+
+    // Génération en batches SÉQUENTIELS
+    const totalVoulu = payload.count || 20;
+    const batchSize = 20;
+    let allProspects = [];
+    let echecs = 0;
+
+    log(`🔄 Génération séquentielle de ${totalVoulu} prospects...`, 'info', logTarget);
+
+    while (allProspects.length < totalVoulu && echecs < 3) {
+      const restant = totalVoulu - allProspects.length;
+      const batchPayload = { ...payload, count: Math.min(batchSize, restant) };
+      log(`📦 Batch — ${allProspects.length}/${totalVoulu} prospects en cours...`, 'info', logTarget);
+      let r = null;
+      try {
+        r = await genererProspectsIA(batchPayload, logTarget);
+      } catch(batchErr) {
+        log('❌ Erreur batch: ' + batchErr.message, 'err', logTarget);
+        echecs++;
+        continue;
+      }
+      if (r?.prospects?.length) {
+        allProspects = [...allProspects, ...r.prospects];
+        echecs = 0;
+        const pct = Math.round((allProspects.length / totalVoulu) * 90);
+        document.getElementById(progressBarId).style.width = pct + '%';
+        log(`✅ ${allProspects.length}/${totalVoulu} prospects obtenus`, 'ok', logTarget);
+      } else {
+        echecs++;
+        log(`⚠️ Batch vide (${echecs}/3 échecs consécutifs)`, 'warn', logTarget);
+      }
+      if (allProspects.length < totalVoulu && echecs < 3) await new Promise(r => setTimeout(r, 700));
+    }
+
+    if (allProspects.length === 0) {
+      log('⚠️ Aucun prospect généré', 'warn', logTarget);
+    } else {
+      log(`🎯 ${allProspects.length}/${totalVoulu} prospects générés !`, 'ok', logTarget);
+    }
+
+    result = { prospects: allProspects };
+  }
+
+  clearInterval(progressInterval);
+  document.getElementById(progressBarId).style.width = '100%';
+
+  if (result && result.prospects && result.prospects.length > 0) {
+    const sessionId = 'session_' + Date.now();
+    const sessionDate = new Date().toLocaleDateString('fr');
+    const sessionName = `${payload.niche} · ${sessionDate}`;
+    const newProspects = result.prospects.map(p => ({
+      ...p,
+      id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2,6),
+      sessionId,
+      date: sessionDate,
+      sent: false,
+      contacte: false,
+      reponse: false,
+      converti: false
+    }));
+
+    // Créer la session
+    const newSession = {
+      id: sessionId,
+      name: sessionName,
+      niche: payload.niche,
+      date: sessionDate,
+      dateTs: Date.now(),
+      count: newProspects.length,
+      platforms: payload.platforms
+    };
+    prospectsessions = [newSession, ...prospectsessions];
+    localStorage.setItem('mb_prospect_sessions', JSON.stringify(prospectsessions));
+
+    prospects = [...newProspects, ...prospects];
+    saveProspects();
+    sessions++;
+    localStorage.setItem('mb_sessions', sessions);
+
+    log(`✅ ${newProspects.length} prospects sauvegardés dans la session "${sessionName}" !`, 'ok', logTarget);
+
+    // Envoi emails auto si activé
+    if (payload.autoEmail && payload.emailFrom) {
+      log('📧 Envoi emails automatiques démarré...', 'info', logTarget);
+      await envoyerEmailsBulk(newProspects, payload, logTarget);
+    }
+
+    updateDashboard();
+    renderDashboardRecent();
+
+    setTimeout(() => {
+      goTo('prospects');
+    }, 1200);
+  } else {
+    log('❌ Aucun prospect retourné', 'err', logTarget);
+  }
+
+  btn.disabled = false;
+  document.getElementById(loaderId).classList.remove('active');
+  setTimeout(() => {
+    document.getElementById(progressWrapId).style.display = 'none';
+    document.getElementById(progressBarId).style.width = '0%';
+  }, 1500);
+}
+
+// ═══════════════════════════════════════════════════════
+//  GÉNÉRATION IA LOCALE (fallback)
+// ═══════════════════════════════════════════════════════
+async function genererProspectsIA(payload, logTarget) {
+  const orKey = OPENROUTER_KEY || localStorage.getItem('mb_openrouter_key') || '';
+  const geminiKey = GEMINI_KEY || localStorage.getItem('mb_gemini_key') || '';
+  const anthropicKey = API_KEY || localStorage.getItem('mb_api_key') || '';
+
+  // Debug visible sur mobile
+  log('🔑 genererProspectsIA — ' + MISTRAL_KEYS.length + ' clés, niche: ' + payload.niche, 'info', logTarget);
+  if (!MISTRAL_KEYS || MISTRAL_KEYS.length === 0) {
+    log('❌ MISTRAL_KEYS vide !', 'err', logTarget);
+    return null;
+  }
+  const niche = payload.niche;
+  const count = Math.min(payload.count, 8);
+  const plateformes = (payload.platforms || ['tiktok','instagram']).join(', ');
+  const prompt = `JSON only. ${count} prospects intéressés par "${niche}" (pas experts). France. Plateformes: ${plateformes}.
+Format: {"prospects":[{"nom":"X","handle":"@x","plateforme":"tiktok","email":"x@gmail.com","tiktok":"","instagram":"","linkedin":"","followers":2000,"bio":"bio","score":8,"raison":"pourquoi","message":"msg prospection"}]}
+${count} objets exactement.`;
+
+  // 1. Mistral en priorité
+  const mistralKey = getNextMistralKey() || MISTRAL_KEY || localStorage.getItem('mb_mistral_key') || '';
+  // ── Mistral avec rotation automatique sur TOUT problème ──
+  if (MISTRAL_KEYS.length > 0) {
+    for (let attempt = 0; attempt < MISTRAL_KEYS.length; attempt++) {
+      const mistralKey = getNextMistralKey();
+      try {
+        log('🤖 Mistral clé ' + attempt + '/' + MISTRAL_KEYS.length + ' — envoi requête...', 'info', logTarget);
+        log('📡 Tentative clé ' + (attempt+1) + ': ' + mistralKey.substring(0,8) + '...', 'info', logTarget);
+        let res;
+        try {
+          res = await fetch('https://api.mistral.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + mistralKey },
+            body: JSON.stringify({ model: 'mistral-small-latest', messages: [{ role: 'user', content: prompt }], max_tokens: 6000, temperature: 0.8 }),
+            signal: AbortSignal.timeout(20000)
+          });
+        } catch(fetchErr) {
+          log('❌ Fetch échoué: ' + fetchErr.message, 'err', logTarget);
+          console.error('Fetch error:', fetchErr);
+          continue;
+        }
+        log('📡 Mistral status: ' + res.status, 'info', logTarget);
+
+        // Erreurs quota/auth → clé suivante
+        if (res.status === 429) { log('🚫 Quota dépassé — clé suivante...', 'warn', logTarget); continue; }
+        if (res.status === 401) { log('🔑 Clé invalide — clé suivante...', 'warn', logTarget); continue; }
+        if (res.status === 402) { log('💳 Crédit insuffisant — clé suivante...', 'warn', logTarget); continue; }
+        if (!res.ok) { log(`⚠️ HTTP ${res.status} — clé suivante...`, 'warn', logTarget); continue; }
+
+        const data = await res.json();
+        if (data.error) { log('⚠️ Erreur API — clé suivante...', 'warn', logTarget); continue; }
+
+        const text = data.choices?.[0]?.message?.content || '';
+        if (!text) { log('⚠️ Réponse vide — clé suivante...', 'warn', logTarget); continue; }
+
+        // Parse JSON
+        try {
+          const clean = text.replace(/```json|```/g, '').trim();
+          const jsonStart = clean.indexOf('{');
+          const jsonEnd = clean.lastIndexOf('}');
+          if (jsonStart === -1) { log('⚠️ Pas de JSON — clé suivante...', 'warn', logTarget); continue; }
+          const parsed = JSON.parse(clean.substring(jsonStart, jsonEnd + 1));
+          if (!parsed.prospects?.length) { log('⚠️ Aucun prospect — clé suivante...', 'warn', logTarget); continue; }
+          log('✅ ' + parsed.prospects.length + ' prospects générés', 'ok', logTarget);
+          trackMistralCall(Math.round((prompt.length + text.length) / 4));
+          return parsed;
+        } catch(parseErr) {
+          log('⚠️ JSON tronqué — clé suivante...', 'warn', logTarget);
+          continue;
+        }
+
+      } catch(e) {
+        console.error('Mistral fetch error:', e);
+        log('⚠️ ' + (e.name === 'TimeoutError' ? 'Timeout 30s' : e.message) + ' — clé suivante...', 'warn', logTarget);
+        continue;
+      }
+    }
+    log('❌ Toutes les clés Mistral épuisées', 'err', logTarget);
+  }
+
+  // 2. OpenRouter fallback (gratuit, fiable)
+  if (orKey) {
+    try {
+      log('🤖 Génération via OpenRouter (Llama gratuit)...', 'info', logTarget);
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + orKey,
+          'HTTP-Referer': 'https://marketingbooster.app',
+          'X-Title': 'MarketingBooster'
+        },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 4000,
+          temperature: 0.7
+        })
+      });
+      log('📡 OpenRouter status: ' + res.status, 'info', logTarget);
+      const data = await res.json();
+      if (data.error) {
+        log('❌ OpenRouter: ' + data.error.message, 'err', logTarget);
+      } else {
+        const text = data.choices?.[0]?.message?.content || '';
+        log('📝 Texte reçu (' + text.length + ' chars)', 'info', logTarget);
+        const clean = text.replace(/```json|```/g, '').trim();
+        const jsonStart = clean.indexOf('{');
+        const jsonEnd = clean.lastIndexOf('}');
+        const jsonStr = clean.substring(jsonStart, jsonEnd + 1);
+        const parsed = JSON.parse(jsonStr);
+        log('✅ OpenRouter a généré ' + (parsed.prospects?.length || 0) + ' prospects !', 'ok', logTarget);
+        return parsed;
+      }
+    } catch(e) {
+      log('❌ OpenRouter échoué: ' + e.message, 'err', logTarget);
+    }
+  }
+
+  // Essai Gemini en priorité (gratuit)
+  if (geminiKey) {
+    try {
+      log('🤖 Génération via Gemini (gratuit)...', 'info', logTarget);
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: 4000 }
+        })
+      });
+      log(`📡 Gemini status: ${res.status}`, 'info', logTarget);
+      const data = await res.json();
+      if (data.error) {
+        log(`❌ Gemini erreur: ${data.error.message}`, 'err', logTarget);
+      } else {
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        log(`📝 Gemini texte reçu (${text.length} chars)`, 'info', logTarget);
+        const clean = text.replace(/```json|```/g, '').trim();
+        const parsed = JSON.parse(clean);
+        log(`✅ Gemini a généré ${parsed.prospects?.length || 0} prospects !`, 'ok', logTarget);
+        return parsed;
+      }
+    } catch(e) {
+      log(`❌ Gemini échoué: ${e.message}`, 'err', logTarget);
+    }
+  }
+
+  // Fallback Anthropic
+  if (anthropicKey) {
+    try {
+      log('🤖 Tentative via Anthropic...', 'info', logTarget);
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 4000, messages: [{ role: 'user', content: prompt }] })
+      });
+      const data = await res.json();
+      if (data.error) { log(`❌ Anthropic: ${data.error.message}`, 'err', logTarget); }
+      else {
+        const text = data.content?.[0]?.text || '';
+        const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+        log(`✅ Anthropic a généré ${parsed.prospects?.length || 0} prospects`, 'ok', logTarget);
+        return parsed;
+      }
+    } catch(e) {
+      log(`❌ Anthropic échoué: ${e.message}`, 'err', logTarget);
+    }
+  }
+
+  log('⚠️ Aucune clé IA valide — génération fictive activée', 'warn', logTarget);
+  return genererFictif(payload);
+}
+
+function genererFictif(payload) {
+  const noms = ['Karim Moussaoui','Sarah Laurent','Thomas Dupont','Amina Joly','Ryan Bernard','Manon Fabre','Lucas Martin','Léa Petit','Noah Rousseau','Emma Moreau'];
+  const plats = payload.platforms || ['tiktok','linkedin'];
+  const result = [];
+  const count = Math.min(payload.count || 10, 15);
+
+  for (let i = 0; i < count; i++) {
+    const nom = noms[i % noms.length];
+    const plat = plats[i % plats.length];
+    const score = Math.floor(Math.random() * 3) + 7;
+    result.push({
+      nom,
+      handle: '@' + nom.split(' ')[0].toLowerCase() + Math.floor(Math.random()*99),
+      plateforme: plat,
+      email: nom.split(' ')[0].toLowerCase() + '@gmail.com',
+      followers: Math.floor(Math.random() * 50000) + 2000,
+      bio: `${payload.niche} · Créateur de contenu · ${payload.location || 'France'}`,
+      score,
+      raison: `Profil très actif dans la niche "${payload.niche}" avec un fort engagement`,
+      message: `Bonjour ${nom.split(' ')[0]},\n\nJ'ai vu ton contenu sur ${plat} autour de "${payload.niche}" et je suis vraiment impressionné par ce que tu fais.\n\n${payload.offer || `Je développe une solution qui pourrait t'aider à booster ta visibilité et tes revenus.`}\n\nSeras-tu disponible pour un échange de 15 min cette semaine ?\n\nCordialement,\n${payload.prenom || 'L\'équipe MarketingBooster'}`
+    });
+  }
+  return { prospects: result };
+}
+
+// ═══════════════════════════════════════════════════════
+//  ENVOI EMAILS EN MASSE
+// ═══════════════════════════════════════════════════════
+async function envoyerEmailsBulk(liste, payload, logTarget = 'global-log') {
+  const delay = (payload.emailDelay || 5) * 1000;
+  let sent = 0;
+  for (const p of liste) {
+    if (!p.email) continue;
+    const subject = (payload.emailSubject || 'Un message pour toi').replace('{nom}', p.nom?.split(' ')[0] || 'toi');
+    await envoyerEmail({
+      to: p.email,
+      name: p.nom,
+      subject,
+      body: p.message,
+      from: payload.emailFrom,
+      fromName: payload.emailName,
+    });
+    p.sent = true;
+    sent++;
+    log(`📧 Email envoyé à ${p.nom} (${p.email})`, 'ok', logTarget);
+    await new Promise(r => setTimeout(r, delay));
+  }
+  saveProspects();
+  log(`✅ ${sent} emails envoyés au total`, 'ok', logTarget);
+}
+
+async function envoyerEmail({ to, name, subject, body, from, fromName }) {
+  const smtp = {
+    host: localStorage.getItem('smtp_host') || '',
+    port: parseInt(localStorage.getItem('smtp_port') || '587'),
+    user: localStorage.getItem('smtp_user') || '',
+    pass: localStorage.getItem('smtp_pass') || '',
+  };
+
+  const payload = { to, name, subject, body, from: from || smtp.user, fromName: fromName || 'MarketingBooster', smtp };
+
+  try {
+    const res = await fetch(BACKEND + '/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(15000)
+    });
+    const data = await res.json();
+    emailLog.unshift({ to, name, subject, date: new Date().toLocaleString('fr'), status: res.ok ? 'ok' : 'err' });
+    localStorage.setItem('mb_emails', JSON.stringify(emailLog));
+    return res.ok;
+  } catch(e) {
+    emailLog.unshift({ to, name, subject, date: new Date().toLocaleString('fr'), status: 'err' });
+    localStorage.setItem('mb_emails', JSON.stringify(emailLog));
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  EMAIL MANUEL
+// ═══════════════════════════════════════════════════════
+async function sendEmailManuel() {
+  const to = document.getElementById('send-to').value.trim();
+  const name = document.getElementById('send-name').value.trim();
+  const subject = document.getElementById('send-subject').value.trim();
+  const body = document.getElementById('send-body').value.trim();
+  if (!to || !subject || !body) { alert('Remplis tous les champs !'); return; }
+
+  document.getElementById('loader-email').classList.add('active');
+  const ok = await envoyerEmail({ to, name, subject, body });
+  document.getElementById('loader-email').classList.remove('active');
+
+  const res = document.getElementById('email-result');
+  res.innerHTML = ok
+    ? `<div class="alert alert-green">✅ Email envoyé avec succès à ${to}</div>`
+    : `<div class="alert alert-coral">❌ Échec de l'envoi — vérifie les paramètres SMTP dans Paramètres</div>`;
+  renderEmailHistory();
+}
+
+async function generateEmailIA() {
+  const name = document.getElementById('send-name').value || 'Prospect';
+  const key = API_KEY;
+  if (!key) { alert('Ajoute ta clé API dans Paramètres pour utiliser l\'IA'); return; }
+
+  document.getElementById('send-body').value = 'Génération en cours...';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: `Génère un email de prospection court et percutant pour ${name}. Objet : marketing / growth. Ton professionnel et humain. Juste le corps de l'email, sans objet.` }]
+      })
+    });
+    const data = await res.json();
+    document.getElementById('send-body').value = data.content?.[0]?.text || '';
+  } catch(e) {
+    document.getElementById('send-body').value = 'Erreur génération IA';
+  }
+}
+
+async function sendAllEmails() {
+  // Redirige vers la page emails pour la section automatisée
+  goTo('emails');
+  setTimeout(() => refreshBulkInfo(), 300);
+}
+
+function refreshBulkInfo() {
+  const smtpUser = localStorage.getItem('smtp_user') || '';
+  const smtpPass = localStorage.getItem('smtp_pass') || '';
+  const statusEl = document.getElementById('bulk-smtp-status');
+  const countEl = document.getElementById('bulk-count-info');
+  if (!statusEl) return;
+
+  if (!smtpUser || !smtpPass) {
+    statusEl.innerHTML = '<div class="alert alert-coral">⚠️ SMTP non configuré — va dans <strong>Paramètres → Config Email</strong> pour le renseigner.</div>';
+  } else {
+    statusEl.innerHTML = '<div class="alert alert-green">✅ SMTP configuré : ' + smtpUser + '</div>';
+  }
+
+  const filterVal = document.getElementById('bulk-filter')?.value || 'unsent';
+  const toSend = filterVal === 'all'
+    ? prospects.filter(p => p.email)
+    : prospects.filter(p => p.email && !p.sent);
+
+  if (countEl) {
+    countEl.innerHTML = toSend.length
+      ? `📊 <strong>${toSend.length}</strong> prospect(s) avec email ${filterVal === 'unsent' ? 'non envoyés' : 'au total'} — ${prospects.filter(p => !p.email).length} sans email ignorés.`
+      : `ℹ️ Aucun prospect correspondant aux critères sélectionnés.`;
+  }
+
+  // Pré-remplir nom expéditeur si vide
+  const nameEl = document.getElementById('bulk-from-name');
+  if (nameEl && !nameEl.value) nameEl.value = 'MarketingBooster';
+}
+
+async function sendAllEmailsBulk() {
+  const smtpUser = localStorage.getItem('smtp_user') || '';
+  const smtpPass = localStorage.getItem('smtp_pass') || '';
+
+  if (!smtpUser || !smtpPass) {
+    document.getElementById('bulk-result').innerHTML = '<div class="alert alert-coral">❌ Configure d\'abord ton SMTP dans <strong>Paramètres → Config Email</strong>.</div>';
+    return;
+  }
+
+  const filterVal = document.getElementById('bulk-filter')?.value || 'unsent';
+  const toSend = filterVal === 'all'
+    ? prospects.filter(p => p.email)
+    : prospects.filter(p => p.email && !p.sent);
+
+  if (!toSend.length) {
+    document.getElementById('bulk-result').innerHTML = '<div class="alert alert-blue">ℹ️ Aucun prospect à envoyer avec les filtres actuels.</div>';
+    return;
+  }
+
+  if (!confirm(`Envoyer ${toSend.length} email(s) via SMTP (${smtpUser}) ?\n\nCela peut prendre quelques minutes.`)) return;
+
+  const subject = document.getElementById('bulk-subject')?.value || '💡 {nom}, j\'ai quelque chose pour toi';
+  const fromName = document.getElementById('bulk-from-name')?.value || 'MarketingBooster';
+  const delay = parseInt(document.getElementById('bulk-delay')?.value || '5');
+
+  const logEl = document.getElementById('log-bulk');
+  const progressWrap = document.getElementById('progress-wrap-bulk');
+  const progressBar = document.getElementById('progress-bar-bulk');
+  const loaderEl = document.getElementById('loader-bulk');
+  const loaderTxt = document.getElementById('loader-bulk-text');
+  const resultEl = document.getElementById('bulk-result');
+
+  logEl.style.display = 'block';
+  logEl.innerHTML = '';
+  progressWrap.style.display = 'block';
+  progressBar.style.width = '0%';
+  loaderEl.classList.add('active');
+  resultEl.innerHTML = '';
+
+  const logBulk = (msg, type = 'info') => {
+    const now = new Date().toLocaleTimeString('fr');
+    logEl.innerHTML += `<span class="${type}">[${now}] ${msg}</span><br>`;
+    logEl.scrollTop = logEl.scrollHeight;
+  };
+
+  logBulk(`🚀 Envoi de ${toSend.length} emails via ${smtpUser}...`, 'info');
+
+  let sent = 0;
+  let errors = 0;
+
+  for (let i = 0; i < toSend.length; i++) {
+    const p = toSend[i];
+    const sub = subject.replace('{nom}', p.nom?.split(' ')[0] || 'toi');
+    loaderTxt.textContent = `Envoi ${i + 1}/${toSend.length} → ${p.nom}`;
+
+    try {
+      const ok = await envoyerEmail({
+        to: p.email,
+        name: p.nom,
+        subject: sub,
+        body: p.message || `Bonjour ${p.nom?.split(' ')[0] || ''},\n\nJ'aimerais vous présenter notre solution.\n\nCordialement,\n${fromName}`,
+        from: smtpUser,
+        fromName
+      });
+
+      if (ok) {
+        p.sent = true;
+        p.contacte = true;
+        sent++;
+        logBulk(`✅ Envoyé à ${p.nom} (${p.email})`, 'ok');
+      } else {
+        errors++;
+        logBulk(`❌ Échec pour ${p.nom} (${p.email})`, 'err');
+      }
+    } catch (e) {
+      errors++;
+      logBulk(`❌ Erreur ${p.nom} : ${e.message}`, 'err');
+    }
+
+    progressBar.style.width = Math.round(((i + 1) / toSend.length) * 100) + '%';
+    saveProspects();
+
+    if (i < toSend.length - 1) await new Promise(r => setTimeout(r, delay * 1000));
+  }
+
+  loaderEl.classList.remove('active');
+  logBulk(`🎉 Terminé — ${sent} envoyés, ${errors} erreurs`, sent > 0 ? 'ok' : 'warn');
+  resultEl.innerHTML = sent > 0
+    ? `<div class="alert alert-green">✅ ${sent} email(s) envoyé(s) avec succès${errors ? ` — ${errors} échec(s)` : ''}</div>`
+    : `<div class="alert alert-coral">❌ Tous les envois ont échoué — vérifie ton SMTP (host, port, mot de passe app).</div>`;
+
+  updateDashboard();
+  renderEmailHistory();
+  refreshBulkInfo();
+}
+
+async function testSmtpNow() {
+  const smtpUser = localStorage.getItem('smtp_user') || '';
+  const smtpPass = localStorage.getItem('smtp_pass') || '';
+  const smtpHost = localStorage.getItem('smtp_host') || '';
+  const resultEl = document.getElementById('bulk-result');
+
+  if (!smtpUser || !smtpPass || !smtpHost) {
+    resultEl.innerHTML = '<div class="alert alert-coral">❌ SMTP incomplet — remplis Host, Email et Mot de passe dans <strong>Paramètres</strong>.</div>';
+    return;
+  }
+
+  resultEl.innerHTML = '<div class="alert alert-blue">🔌 Test SMTP en cours...</div>';
+  const ok = await envoyerEmail({
+    to: smtpUser,
+    name: 'Test',
+    subject: '✅ Test SMTP MarketingBooster',
+    body: 'Si tu reçois cet email, ton SMTP est bien configuré !',
+    from: smtpUser,
+    fromName: 'MarketingBooster Test'
+  });
+  resultEl.innerHTML = ok
+    ? '<div class="alert alert-green">✅ Test réussi — vérifie ta boîte mail (' + smtpUser + ')</div>'
+    : '<div class="alert alert-coral">❌ Échec — vérifie host (' + smtpHost + '), port, et le mot de passe app (pas ton mot de passe normal)</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════
+// ═══════════ SESSIONS ═══════════
+function renderSessions() {
+  document.getElementById('prospect-count').textContent = prospects.length;
+  document.getElementById('session-count').textContent = prospectsessions.length;
+  const grid = document.getElementById('sessions-grid');
+  if (!prospectsessions.length) {
+    grid.innerHTML = '<div class="empty-state"><div class="icon">📁</div><p>Lance une prospection pour créer ta première session.</p></div>';
+    return;
+  }
+  grid.innerHTML = '<div class="sessions-grid">' + prospectsessions.map(s => {
+    const sp = prospects.filter(p => p.sessionId === s.id);
+    const nb_c = sp.filter(p => p.contacte).length;
+    const nb_r = sp.filter(p => p.reponse).length;
+    const nb_k = sp.filter(p => p.converti).length;
+    const nb_n = sp.length - nb_c;
+    return '<div class="session-card" onclick="ouvrirSession(\'' + s.id + '\')">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+        '<div class="s-count">' + sp.length + '</div>' +
+        '<span style="font-size:0.72rem;color:var(--muted);">' + s.date + '</span>' +
+      '</div>' +
+      '<div class="s-name">' + s.name + '</div>' +
+      '<div class="s-meta">' + (s.platforms||[]).map(p => platIcon(p)).join(' ') + ' · ' + s.niche + '</div>' +
+      '<div class="status-pills">' +
+        (nb_n > 0 ? '<span class="status-pill pill-new">🆕 ' + nb_n + ' new</span>' : '') +
+        (nb_c > 0 ? '<span class="status-pill pill-contacte">📤 ' + nb_c + ' contactés</span>' : '') +
+        (nb_r > 0 ? '<span class="status-pill pill-reponse">💬 ' + nb_r + ' réponses</span>' : '') +
+        (nb_k > 0 ? '<span class="status-pill pill-converti">✅ ' + nb_k + ' convertis</span>' : '') +
+      '</div>' +
+      '<div class="s-actions" onclick="event.stopPropagation()">' +
+        '<button class="btn btn-outline btn-sm" onclick="renamerSessionId(\'' + s.id + '\')">✏️</button>' +
+        '<button class="btn btn-outline btn-sm" onclick="exportSessionCSVById(\'' + s.id + '\')">📥 CSV</button>' +
+        '<button class="btn btn-sm" style="color:var(--coral);border:1.5px solid var(--coral);background:transparent;padding:0.4rem 0.7rem;border-radius:100px;font-size:0.75rem;cursor:pointer;" onclick="deleteSession(\'' + s.id + '\')">🗑️</button>' +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function ouvrirSession(id) {
+  currentSessionId = id;
+  const s = prospectsessions.find(x => x.id === id);
+  document.getElementById('view-sessions').style.display = 'none';
+  document.getElementById('view-prospects').style.display = 'block';
+  document.getElementById('session-title').textContent = s ? s.name : 'Session';
+  const sp = prospects.filter(p => p.sessionId === id);
+  document.getElementById('session-subtitle').textContent = sp.length + ' prospects · créée le ' + (s ? s.date : '');
+  renderSessionStats(id);
+  renderProspects();
+}
+
+function retourSessions() {
+  currentSessionId = null;
+  document.getElementById('view-sessions').style.display = 'block';
+  document.getElementById('view-prospects').style.display = 'none';
+  renderSessions();
+}
+
+function renderSessionStats(id) {
+  const sp = prospects.filter(p => p.sessionId === id);
+  const nb_c = sp.filter(p => p.contacte).length;
+  const nb_r = sp.filter(p => p.reponse).length;
+  const nb_k = sp.filter(p => p.converti).length;
+  const stats = [
+    { num: sp.length, lbl: 'Total', color: 'var(--text)' },
+    { num: sp.length - nb_c, lbl: '🆕 Non contactés', color: 'var(--muted)' },
+    { num: nb_c, lbl: '📤 Contactés', color: 'var(--blue)' },
+    { num: nb_r, lbl: '💬 Réponses', color: 'var(--amber)' },
+    { num: nb_k, lbl: '✅ Convertis', color: 'var(--green)' }
+  ];
+  document.getElementById('session-stats-row').innerHTML = stats.map(s =>
+    '<div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:0.9rem 1.2rem;min-width:90px;">' +
+    '<div style="font-family:Playfair Display,serif;font-size:1.5rem;font-weight:900;color:' + s.color + '">' + s.num + '</div>' +
+    '<div style="font-size:0.72rem;color:var(--muted);">' + s.lbl + '</div></div>'
+  ).join('');
+}
+
+function renamerSessionId(id) {
+  const s = prospectsessions.find(x => x.id === id);
+  const newName = prompt('Nouveau nom :', s ? s.name : '');
+  if (!newName) return;
+  s.name = newName;
+  localStorage.setItem('mb_prospect_sessions', JSON.stringify(prospectsessions));
+  if (currentSessionId === id) document.getElementById('session-title').textContent = newName;
+  renderSessions();
+}
+
+function renamerSession() { if (currentSessionId) renamerSessionId(currentSessionId); }
+
+function deleteSession(id) {
+  if (!confirm('Supprimer cette session et ses ' + prospects.filter(p => p.sessionId === id).length + ' prospects ?')) return;
+  prospectsessions = prospectsessions.filter(s => s.id !== id);
+  prospects = prospects.filter(p => p.sessionId !== id);
+  localStorage.setItem('mb_prospect_sessions', JSON.stringify(prospectsessions));
+  saveProspects();
+  renderSessions();
+}
+
+function toggleStatus(pid, field) {
+  const p = prospects.find(x => x.id === pid);
+  if (!p) return;
+  if (field === 'contacte') {
+    p.contacte = !p.contacte;
+    if (!p.contacte) { p.reponse = false; p.converti = false; }
+  } else if (field === 'reponse') {
+    p.reponse = !p.reponse;
+    if (p.reponse) p.contacte = true;
+    if (!p.reponse) p.converti = false;
+  } else if (field === 'converti') {
+    p.converti = !p.converti;
+    if (p.converti) { p.contacte = true; p.reponse = true; }
+  }
+  saveProspects();
+  if (currentSessionId) renderSessionStats(currentSessionId);
+  renderProspects();
+}
+
+function exportSessionCSV() { if (currentSessionId) exportSessionCSVById(currentSessionId); }
+function exportSessionCSVById(id) {
+  const sp = prospects.filter(p => p.sessionId === id);
+  const headers = ['nom','handle','plateforme','email','tiktok','instagram','linkedin','followers','score','bio','raison','message','contacte','reponse','converti','date'];
+  const rows = sp.map(p => headers.map(h => '"' + (p[h]||'').toString().replace(/"/g,'""')+'"'). join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  download('session-prospects.csv', csv, 'text/csv');
+}
+
+// ═══════════ RENDER PROSPECTS ═══════════
+function platIcon(p) { return { tiktok:'🎵', linkedin:'💼', instagram:'📸', google:'🔍', maps:'📍' }[p] || '🌐'; }
+function validUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const u = url.trim();
+  return (u.startsWith('http://') || u.startsWith('https://')) && u.length > 12;
+}
+function safeUrl(url, handle, platform) {
+  if (validUrl(url)) return url;
+  const h = (handle || '').replace(/^@/, '').trim();
+  if (!h) return '#';
+  if (platform === 'tiktok') return 'https://www.tiktok.com/@' + encodeURIComponent(h);
+  if (platform === 'instagram') return 'https://www.instagram.com/' + encodeURIComponent(h);
+  if (platform === 'linkedin') return 'https://www.linkedin.com/in/' + encodeURIComponent(h);
+  return '#';
+}
+function formatNum(n) { return n >= 1000 ? (n/1000).toFixed(1)+'k' : n; }
+
+function renderProspects() {
+  const search = document.getElementById('search-prospects')?.value.toLowerCase() || '';
+  const platFilter = document.getElementById('filter-platform')?.value || '';
+  const statusFilter = document.getElementById('filter-status')?.value || '';
+  let filtered = prospects.filter(p => {
+    if (currentSessionId && p.sessionId !== currentSessionId) return false;
+    const ms = !search || p.nom?.toLowerCase().includes(search) || p.email?.toLowerCase().includes(search) || p.bio?.toLowerCase().includes(search);
+    const mp = !platFilter || p.plateforme === platFilter;
+    const mst = !statusFilter ||
+      (statusFilter === 'new' && !p.contacte) ||
+      (statusFilter === 'contacte' && p.contacte && !p.reponse) ||
+      (statusFilter === 'reponse' && p.reponse && !p.converti) ||
+      (statusFilter === 'converti' && p.converti);
+    return ms && mp && mst;
+  });
+  const container = document.getElementById('prospects-container');
+  if (!filtered.length) { container.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>Aucun prospect trouvé.</p></div>'; return; }
+  container.innerHTML = '<div class="prospects-grid">' + filtered.map(p => {
+    const sc = p.converti ? 'var(--green)' : p.reponse ? 'var(--amber)' : p.contacte ? 'var(--blue)' : 'var(--border)';
+    const sl = p.converti ? '✅ Converti' : p.reponse ? '💬 Réponse' : p.contacte ? '📤 Contacté' : '🆕 New';
+    return '<div class="prospect-card" style="border-left:4px solid ' + sc + '">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+        '<div><div class="p-name">' + p.nom + '</div>' +
+        '<div class="p-handle">' + (p.handle||'')+' · <span class="plat-tag tag-'+p.plateforme+'">'+platIcon(p.plateforme)+' '+p.plateforme+'</span></div></div>' +
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">' +
+          '<span class="score-badge ' + (p.score>=8?'score-hi':p.score>=6?'score-md':'score-lo') + '">' + p.score + '/10</span>' +
+          '<span style="font-size:0.65rem;font-weight:700;color:' + sc + '">' + sl + '</span>' +
+        '</div>' +
+      '</div>' +
+      (p.bio ? '<div class="p-bio">'+p.bio+'</div>' : '') +
+      (p.email ? '<div style="font-size:0.78rem;color:var(--blue);margin-bottom:0.4rem;">📧 '+p.email+(p.followers?' · '+formatNum(p.followers)+' followers':'')+'</div>' : '') +
+      '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.5rem;">' +
+        (validUrl(p.tiktok) ? '<a href="'+safeUrl(p.tiktok, p.handle, 'tiktok')+'" target="_blank" rel="noopener" style="padding:0.2rem 0.6rem;font-size:0.72rem;background:#010101;color:white;border-radius:100px;text-decoration:none;font-weight:700;">🎵 TikTok</a>' : (p.handle ? '<a href="https://www.tiktok.com/@'+encodeURIComponent(p.handle.replace(/^@/,""))+'" target="_blank" rel="noopener" style="padding:0.2rem 0.6rem;font-size:0.72rem;background:#010101;color:white;border-radius:100px;text-decoration:none;font-weight:700;">🎵 TikTok</a>' : '')) +
+        (validUrl(p.instagram) ? '<a href="'+safeUrl(p.instagram, p.handle, 'instagram')+'" target="_blank" rel="noopener" style="padding:0.2rem 0.6rem;font-size:0.72rem;background:linear-gradient(45deg,#f09433,#dc2743);color:white;border-radius:100px;text-decoration:none;font-weight:700;">📸 Insta</a>' : (p.plateforme==="instagram" && p.handle ? '<a href="https://www.instagram.com/'+encodeURIComponent(p.handle.replace(/^@/,""))+'" target="_blank" rel="noopener" style="padding:0.2rem 0.6rem;font-size:0.72rem;background:linear-gradient(45deg,#f09433,#dc2743);color:white;border-radius:100px;text-decoration:none;font-weight:700;">📸 Insta</a>' : '')) +
+        (validUrl(p.linkedin) ? '<a href="'+p.linkedin+'" target="_blank" rel="noopener" style="padding:0.2rem 0.6rem;font-size:0.72rem;background:#0077b5;color:white;border-radius:100px;text-decoration:none;font-weight:700;">💼 LinkedIn</a>' : '') +
+        (validUrl(p.twitter) ? '<a href="'+p.twitter+'" target="_blank" rel="noopener" style="padding:0.2rem 0.6rem;font-size:0.72rem;background:#000;color:white;border-radius:100px;text-decoration:none;font-weight:700;">𝕏 X</a>' : '') +
+      '</div>' +
+      (p.raison ? '<div style="font-size:0.75rem;color:var(--muted);font-style:italic;margin-bottom:0.5rem;">💡 '+p.raison+'</div>' : '') +
+      (p.message ? '<div class="p-msg">'+p.message.substring(0,200)+(p.message.length>200?'...':'')+ '</div>' : '') +
+      '<div class="status-toggle">' +
+        '<button class="status-btn ' + (p.contacte?'active-contacte':'')+'" onclick="toggleStatus(\''+p.id+'\',\'contacte\')">📤 Contacté</button>' +
+        '<button class="status-btn ' + (p.reponse?'active-reponse':'')+'" onclick="toggleStatus(\''+p.id+'\',\'reponse\')">💬 Réponse</button>' +
+        '<button class="status-btn ' + (p.converti?'active-converti':'')+'" onclick="toggleStatus(\''+p.id+'\',\'converti\')">✅ Converti</button>' +
+      '</div>' +
+      '<div class="p-actions" style="margin-top:0.6rem;">' +
+        (p.email ? '<button class="btn btn-green btn-sm" onclick="quickSendEmail(\''+p.id+'\')">📧 Email</button>' : '') +
+        '<button class="btn btn-outline btn-sm" onclick="copyMsg(\''+p.id+'\')">📋 Copier</button>' +
+        '<button class="btn btn-outline btn-sm" style="color:var(--coral);border-color:var(--coral);" onclick="deleteProspect(\''+p.id+'\')">🗑️</button>' +
+      '</div></div>';
+  }).join('') + '</div>';
+}
+
+function filterProspects() { renderProspects(); }
+
+async function quickSendEmail(id) {
+  const p = prospects.find(x => String(x.id) === String(id));
+  if (!p || !p.email) return;
+
+  const smtpUser = localStorage.getItem('smtp_user') || '';
+  const smtpPass = localStorage.getItem('smtp_pass') || '';
+  const sujet = (document.getElementById('email-subject')?.value || 'Un message pour toi').replace('{nom}', p.nom?.split(' ')[0] || 'toi');
+
+  // Pas de SMTP configuré → options alternatives
+  if (!smtpUser || !smtpPass) {
+    showEmailOptions(p, sujet);
+    return;
+  }
+
+  const ok = await envoyerEmail({
+    to: p.email, name: p.nom,
+    subject: sujet,
+    body: p.message,
+    from: smtpUser,
+    fromName: document.getElementById('email-name')?.value || 'MarketingBooster'
+  });
+  if (ok) {
+    p.sent = true; p.contacte = true;
+    saveProspects(); renderProspects();
+    log('📧 Email envoyé à ' + p.nom, 'ok');
+    if (currentSessionId) renderSessionStats(currentSessionId);
+  } else {
+    showEmailOptions(p, sujet);
+  }
+}
+
+function showEmailOptions(p, sujet) {
+  // Construire le lien mailto
+  const mailtoUrl = 'mailto:' + encodeURIComponent(p.email)
+    + '?subject=' + encodeURIComponent(sujet)
+    + '&body=' + encodeURIComponent(p.message || '');
+
+  // Créer une modale légère
+  const existing = document.getElementById('email-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'email-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+  modal.innerHTML = `
+    <div style="background:white;border-radius:20px;padding:1.8rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+      <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin-bottom:0.3rem;">📧 Envoyer à ${p.nom}</div>
+      <div style="font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;">${p.email}</div>
+
+      <a href="${mailtoUrl}" style="display:flex;align-items:center;gap:0.8rem;padding:1rem;border:1.5px solid var(--border);border-radius:14px;text-decoration:none;color:var(--text);margin-bottom:0.8rem;transition:border 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+        <span style="font-size:1.4rem;">📬</span>
+        <div>
+          <div style="font-weight:700;font-size:0.9rem;">Ouvrir mon app email</div>
+          <div style="font-size:0.75rem;color:var(--muted);">Gmail, Outlook, Mail... avec tout pré-rempli</div>
+        </div>
+      </a>
+
+      <button onclick="copyEmailComplet('${p.id}')" style="display:flex;align-items:center;gap:0.8rem;padding:1rem;border:1.5px solid var(--border);border-radius:14px;background:white;width:100%;cursor:pointer;margin-bottom:0.8rem;text-align:left;transition:border 0.2s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+        <span style="font-size:1.4rem;">📋</span>
+        <div>
+          <div style="font-weight:700;font-size:0.9rem;">Copier le message</div>
+          <div style="font-size:0.75rem;color:var(--muted);">Coller manuellement dans n'importe quelle app</div>
+        </div>
+      </button>
+
+      <button onclick="copyEmailAddr('${p.email}')" style="display:flex;align-items:center;gap:0.8rem;padding:1rem;border:1.5px solid var(--border);border-radius:14px;background:white;width:100%;cursor:pointer;margin-bottom:1.2rem;text-align:left;transition:border 0.2s;" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--border)'">
+        <span style="font-size:1.4rem;">📩</span>
+        <div>
+          <div style="font-weight:700;font-size:0.9rem;">Copier l'adresse email</div>
+          <div style="font-size:0.75rem;color:var(--muted);">${p.email}</div>
+        </div>
+      </button>
+
+      <div style="font-size:0.75rem;color:var(--muted);text-align:center;margin-bottom:1rem;">
+        💡 Configure ton SMTP dans <strong>Paramètres</strong> pour l'envoi automatique
+      </div>
+
+      <button onclick="document.getElementById('email-modal').remove()" style="width:100%;padding:0.7rem;border-radius:100px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-weight:600;font-size:0.85rem;">Fermer</button>
+    </div>
+  `;
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+function copyEmailComplet(id) {
+  const p = prospects.find(x => x.id === id);
+  if (!p) return;
+  navigator.clipboard.writeText(p.message || '').then(() => {
+    document.getElementById('email-modal')?.remove();
+    log('📋 Message copié pour ' + p.nom, 'ok');
+    // Marquer comme contacté auto
+    p.contacte = true;
+    saveProspects();
+    if (currentSessionId) renderSessionStats(currentSessionId);
+    renderProspects();
+  });
+}
+
+function copyEmailAddr(email) {
+  navigator.clipboard.writeText(email).then(() => {
+    log('📩 Email copié : ' + email, 'ok');
+  });
+}
+
+function copyMsg(id) {
+  const p = prospects.find(x => String(x.id) === String(id));
+  if (!p?.message) return;
+  navigator.clipboard.writeText(p.message).then(() => {
+    log(`📋 Message de ${p.nom} copié`, 'ok');
+  });
+}
+
+function deleteProspect(id) {
+  prospects = prospects.filter(p => String(p.id) !== String(id));
+  saveProspects();
+  renderProspects();
+  updateDashboard();
+}
+
+function renderDashboardRecent() {
+  const el = document.getElementById('dashboard-recent');
+  if (!prospects.length) { el.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>Lance une prospection pour voir tes prospects ici.</p></div>`; return; }
+  const top5 = prospects.slice(0, 5);
+  el.innerHTML = `<table><thead><tr><th>Nom</th><th>Plateforme</th><th>Email</th><th>Score</th><th>Date</th></tr></thead><tbody>
+  ${top5.map(p => `<tr>
+    <td><strong>${p.nom}</strong><br><span style="color:var(--muted);font-size:0.75rem;">${p.handle || ''}</span></td>
+    <td><span class="plat-tag tag-${p.plateforme}">${platIcon(p.plateforme)} ${p.plateforme}</span></td>
+    <td style="font-size:0.78rem;">${p.email || '—'}</td>
+    <td><span class="score-badge ${p.score >= 8 ? 'score-hi' : p.score >= 6 ? 'score-md' : 'score-lo'}">${p.score}/10</span></td>
+    <td style="color:var(--muted);font-size:0.78rem;">${p.date || '—'}</td>
+  </tr>`).join('')}
+  </tbody></table>`;
+}
+
+function renderEmailHistory() {
+  const el = document.getElementById('email-history');
+  if (!emailLog.length) { el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Aucun email envoyé pour l'instant.</p></div>`; return; }
+  el.innerHTML = `<table><thead><tr><th>À</th><th>Objet</th><th>Date</th><th>Statut</th></tr></thead><tbody>
+  ${emailLog.slice(0,30).map(e => `<tr>
+    <td>${e.name || ''} <span style="color:var(--muted);font-size:0.75rem;">${e.to}</span></td>
+    <td style="font-size:0.82rem;">${e.subject}</td>
+    <td style="color:var(--muted);font-size:0.78rem;">${e.date}</td>
+    <td>${e.status === 'ok' ? '<span class="score-badge score-hi">✓ Envoyé</span>' : '<span class="score-badge score-lo">✗ Erreur</span>'}</td>
+  </tr>`).join('')}
+  </tbody></table>`;
+}
+
+function renderStats() {
+  document.getElementById('s-total').textContent = prospects.length;
+  document.getElementById('s-emails').textContent = emailLog.length;
+  document.getElementById('s-sessions').textContent = sessions;
+  const avgScore = prospects.length ? (prospects.reduce((s,p)=>s+(p.score||0),0)/prospects.length).toFixed(1) : '—';
+  document.getElementById('s-avg').textContent = avgScore;
+
+  // Répartition plateformes
+  const platCounts = {};
+  prospects.forEach(p => { platCounts[p.plateforme] = (platCounts[p.plateforme] || 0) + 1; });
+  const el = document.getElementById('stats-platforms');
+  if (!Object.keys(platCounts).length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">📊</div><p>Lance une prospection pour voir les stats.</p></div>`;
+    return;
+  }
+  el.innerHTML = Object.entries(platCounts).map(([plat,count]) => `
+    <div class="settings-row">
+      <div><div class="settings-label">${platIcon(plat)} ${plat}</div></div>
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <div class="progress-wrap" style="width:200px;margin:0;"><div class="progress-bar" style="width:${Math.round(count/prospects.length*100)}%;"></div></div>
+        <span style="font-weight:700;">${count}</span>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('stats-log').innerHTML = document.getElementById('global-log').innerHTML;
+}
+
+function renderSequences() {
+  const el = document.getElementById('sequences-list');
+  if (!sequences.length) { el.innerHTML = `<div class="empty-state"><div class="icon">⚡</div><p>Aucune séquence créée.</p></div>`; return; }
+  el.innerHTML = sequences.map((s,i) => `
+    <div class="settings-row">
+      <div>
+        <div class="settings-label">⚡ ${s.name}</div>
+        <div class="settings-desc">${s.delay} jours · 3 emails · créée le ${s.date}</div>
+      </div>
+      <button class="btn btn-coral btn-sm" onclick="deleteSeq(${i})">🗑️</button>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  SEQUENCES
+// ═══════════════════════════════════════════════════════
+function saveSequence() {
+  const name = document.getElementById('seq-name').value.trim();
+  if (!name) { alert('Donne un nom à ta séquence !'); return; }
+  sequences.push({
+    name,
+    delay: document.getElementById('seq-delay').value,
+    e1: document.getElementById('seq-e1').value,
+    e2: document.getElementById('seq-e2').value,
+    e3: document.getElementById('seq-e3').value,
+    date: new Date().toLocaleDateString('fr')
+  });
+  localStorage.setItem('mb_sequences', JSON.stringify(sequences));
+  renderSequences();
+  log(`✅ Séquence "${name}" sauvegardée`, 'ok');
+}
+
+function deleteSeq(i) {
+  sequences.splice(i, 1);
+  localStorage.setItem('mb_sequences', JSON.stringify(sequences));
+  renderSequences();
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════
+function exportData() {
+  const format = document.getElementById('export-format').value;
+  const minScore = parseInt(document.getElementById('export-score').value);
+  const filtered = prospects.filter(p => !minScore || p.score >= minScore);
+
+  if (!filtered.length) { alert('Aucun prospect à exporter !'); return; }
+
+  if (format === 'csv') {
+    const headers = ['nom','handle','plateforme','email','followers','score','bio','message','date','sent'];
+    const rows = filtered.map(p => headers.map(h => `"${(p[h]||'').toString().replace(/"/g,'""')}"`).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    download('prospects-marketingbooster.csv', csv, 'text/csv');
+  } else {
+    download('prospects-marketingbooster.json', JSON.stringify(filtered, null, 2), 'application/json');
+  }
+  log(`📥 Export ${format.toUpperCase()} : ${filtered.length} prospects`, 'ok');
+}
+
+function copyJSON() {
+  navigator.clipboard.writeText(JSON.stringify(prospects, null, 2));
+  log('📋 JSON copié dans le presse-papiers', 'ok');
+}
+
+function download(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════════════════
+function saveSettings() {
+  BACKEND = document.getElementById('setting-backend').value.trim();
+  API_KEY = document.getElementById('setting-api-key').value.trim();
+  GEMINI_KEY = document.getElementById('setting-gemini-key').value.trim();
+  localStorage.setItem('mb_backend', BACKEND);
+  localStorage.setItem('mb_api_key', API_KEY);
+  localStorage.setItem('mb_gemini_key', GEMINI_KEY);
+  document.getElementById('settings-result').innerHTML = `<div class="alert alert-green">✅ Paramètres sauvegardés !</div>`;
+  checkBackend();
+}
+
+function saveSmtp() {
+  localStorage.setItem('smtp_host', document.getElementById('smtp-host').value);
+  localStorage.setItem('smtp_port', document.getElementById('smtp-port').value);
+  localStorage.setItem('smtp_user', document.getElementById('smtp-user').value);
+  localStorage.setItem('smtp_pass', document.getElementById('smtp-pass').value);
+  document.getElementById('smtp-result').innerHTML = `<div class="alert alert-green">✅ Config SMTP sauvegardée !</div>`;
+  log('📧 Config SMTP sauvegardée', 'ok');
+}
+
+async function testBackend() {
+  const url = document.getElementById('setting-backend').value.trim();
+  const res = document.getElementById('settings-result');
+  res.innerHTML = `<div class="alert alert-blue">🔌 Test de connexion...</div>`;
+  try {
+    const r = await fetch(url + '/health', { signal: AbortSignal.timeout(8000) });
+    res.innerHTML = r.ok
+      ? `<div class="alert alert-green">✅ Backend connecté ! Status: ${r.status}</div>`
+      : `<div class="alert alert-coral">⚠️ Backend répond mais avec erreur (${r.status})</div>`;
+  } catch(e) {
+    res.innerHTML = `<div class="alert alert-coral">❌ Backend inaccessible. Vérifie l'URL ou si Render est réveillé.</div>`;
+  }
+}
+
+function clearAll() {
+  if (!confirm('Supprimer TOUS les prospects ? Cette action est irréversible.')) return;
+  prospects = [];
+  saveProspects();
+  updateDashboard();
+  log('🗑️ Tous les prospects supprimés', 'warn');
+}
+
+function toggleBtn(btn) { btn.classList.toggle('on'); }
+
+function resetForm() {
+  ['adv-niche','adv-kw','adv-loc','adv-offer','adv-prenom'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════
+function saveProspects() {
+  localStorage.setItem('mb_prospects', JSON.stringify(prospects));
+  updateDashboard();
+}
+
+function updateDashboard() {
+  document.getElementById('stat-total').textContent = prospects.length;
+  document.getElementById('stat-emails').textContent = emailLog.length;
+  document.getElementById('stat-sessions').textContent = sessions;
+  const avg = prospects.length ? (prospects.reduce((s,p)=>s+(p.score||0),0)/prospects.length).toFixed(1) : '—';
+  document.getElementById('stat-score').textContent = avg;
+
+  // Mini chart
+  const chartEl = document.getElementById('chart-prospects');
+  if (chartEl) {
+    const weeks = [3,5,8,12,7,15,prospects.length > 0 ? Math.min(prospects.length,20) : 10];
+    const max = Math.max(...weeks);
+    chartEl.innerHTML = weeks.map(v => `<div class="bar-mini" style="height:${Math.round(v/max*100)}%;"></div>`).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════
+//  PROSPECTION AVANCÉE (page séparée, cible unique)
+// ═══════════════════════════════════════════════════════
+async function lancerProspectionAvancee() {
+  const niche = document.getElementById('adv2-niche').value.trim();
+  if (!niche) { alert('🎯 Indique une niche / secteur cible !'); return; }
+
+  const plateformes = [...document.querySelectorAll('#adv2-platforms .plat-chip.sel')].map(c => c.dataset.p);
+  if (!plateformes.length) { alert('Sélectionne au moins une plateforme !'); return; }
+
+  const useIA      = !document.getElementById('optblock-ia')?.classList.contains('opt-block-off');
+  const useEmail   = !document.getElementById('optblock-email')?.classList.contains('opt-block-off');
+  const useFiltres = !document.getElementById('optblock-filtres')?.classList.contains('opt-block-off');
+
+  const btn = document.getElementById('btn-launch-adv2');
+  btn.disabled = true;
+  document.getElementById('log-adv2').style.display = 'block';
+  document.getElementById('progress-wrap-adv2').style.display = 'block';
+  document.getElementById('loader-adv2').classList.add('active');
+
+  const payload = {
+    niche,
+    location: document.getElementById('adv2-loc').value,
+    platforms: plateformes,
+    count: parseInt(document.getElementById('adv2-count').value),
+    minScore: parseInt(document.getElementById('adv2-score').value),
+    lang: 'fr',
+    tone: useIA ? (document.querySelector('#tone-chips-adv .plat-chip.sel')?.dataset.t || 'professionnel') : 'professionnel',
+    offer: useIA ? (document.getElementById('adv2-offer')?.value || '') : '',
+    prenom: useIA ? (document.getElementById('adv2-prenom')?.value || '') : '',
+    msgLen: useIA ? (document.getElementById('adv2-msg-len')?.value || 'moyen') : 'moyen',
+    msgType: 'email',
+    autoEmail: useEmail,
+    emailFrom: useEmail ? (document.getElementById('adv2-email-from')?.value || '') : '',
+    emailName: useEmail ? (document.getElementById('adv2-email-name')?.value || '') : '',
+    emailSubject: useEmail ? (document.getElementById('adv2-email-subject')?.value || '') : '',
+    emailDelay: useEmail ? parseInt(document.getElementById('adv2-email-delay')?.value || 5) : 5,
+    followMin: useFiltres ? (document.getElementById('adv2-follow-min')?.value || '') : '',
+    followMax: useFiltres ? (document.getElementById('adv2-follow-max')?.value || '') : '',
+    emailRequired: useFiltres ? (document.getElementById('adv2-email-req')?.value === '1') : true,
+    excludeContacted: useFiltres ? (document.getElementById('adv2-excl')?.value === '1') : true,
+    excludeKw: useFiltres ? (document.getElementById('adv2-exclude-kw')?.value || '') : '',
+  };
+
+  log(`🚀 Prospection avancée : "${niche}" sur [${plateformes.join(', ')}]`, 'info', 'log-adv2');
+
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress = Math.min(progress + Math.random() * 8, 88);
+    document.getElementById('progress-bar-adv2').style.width = progress + '%';
+    const steps = ['Initialisation...','Connexion aux plateformes...','Collecte des profils...','Analyse IA...','Génération des messages...','Calcul des scores...','Finalisation...'];
+    document.getElementById('loader-adv2-text').textContent = steps[Math.min(Math.floor((progress/88)*steps.length), steps.length-1)];
+  }, 600);
+
+  const totalVoulu = payload.count || 50;
+  // Génération séquentielle
+  log(`🔄 Génération séquentielle de ${totalVoulu} prospects...`, 'info', 'log-adv2');
+  const batchSize2 = 20;
+  let allProspects2 = [];
+  let echecs2 = 0;
+  while (allProspects2.length < totalVoulu && echecs2 < 3) {
+    const restant2 = totalVoulu - allProspects2.length;
+    const r2 = await genererProspectsIA({ ...payload, count: Math.min(batchSize2, restant2) }, 'log-adv2');
+    if (r2?.prospects?.length) { allProspects2 = [...allProspects2, ...r2.prospects]; echecs2 = 0; }
+    else echecs2++;
+    if (allProspects2.length < totalVoulu && echecs2 < 3) await new Promise(r => setTimeout(r, 700));
+  }
+  // dummy pour compatibilité
+  const batchResults2 = [allProspects2];
+  let allProspects = batchResults2.flat().slice(0, totalVoulu);
+
+  clearInterval(progressInterval);
+
+  if (allProspects.length) {
+    const sessionId = 'session_' + Date.now();
+    const sessionDate = new Date().toLocaleDateString('fr');
+    const newProspects = allProspects.map(p => ({
+      ...p,
+      id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2,6),
+      sessionId, date: sessionDate,
+      sent:false, contacte:false, reponse:false, converti:false
+    }));
+    prospectsessions = [{ id:sessionId, name: niche + ' · ' + sessionDate, niche, date:sessionDate, dateTs:Date.now(), count:newProspects.length, platforms:plateformes }, ...prospectsessions];
+    localStorage.setItem('mb_prospect_sessions', JSON.stringify(prospectsessions));
+    prospects = [...newProspects, ...prospects];
+    saveProspects();
+    sessions++;
+    localStorage.setItem('mb_sessions', sessions);
+
+    log(`✅ ${allProspects.length} prospects sauvegardés !`, 'ok', 'log-adv2');
+
+    if (useEmail && payload.emailFrom) {
+      log('📧 Envoi emails en cours...', 'info', 'log-adv2');
+      await envoyerEmailsBulk(newProspects, payload, 'log-adv2');
+    }
+
+    updateDashboard();
+    renderDashboardRecent();
+    setTimeout(() => goTo('prospects'), 1200);
+  } else {
+    log('❌ Aucun prospect retourné', 'err', 'log-adv2');
+  }
+
+  document.getElementById('progress-bar-adv2').style.width = '100%';
+  document.getElementById('loader-adv2').classList.remove('active');
+  btn.disabled = false;
+  setTimeout(() => {
+    document.getElementById('progress-wrap-adv2').style.display = 'none';
+    document.getElementById('progress-bar-adv2').style.width = '0%';
+  }, 1500);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore settings
+  const savedBackend = localStorage.getItem('mb_backend');
+  const savedKey = localStorage.getItem('mb_api_key');
+  if (savedBackend) { BACKEND = savedBackend; document.getElementById('setting-backend').value = savedBackend; }
+  if (savedKey) { API_KEY = savedKey; document.getElementById('setting-api-key').value = savedKey; }
+  prospectsessions = JSON.parse(localStorage.getItem('mb_prospect_sessions') || '[]');
+  configs = JSON.parse(localStorage.getItem('mb_configs') || '[]');
+  // Ajouter une config par défaut si vide
+  if (!configs.length) ajouterConfig();
+  else renderConfigs();
+
+  // Restore SMTP
+  ['smtp-host','smtp-port','smtp-user','smtp-pass'].forEach(id => {
+    const stored = localStorage.getItem(id.replace('-','_'));
+    if (stored) document.getElementById(id).value = stored;
+  });
+
+  updateDashboard();
+  renderDashboardRecent();
+  checkBackend();
+});
+</script>
+</body>
+</html>
